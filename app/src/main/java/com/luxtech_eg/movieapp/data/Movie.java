@@ -1,9 +1,11 @@
 package com.luxtech_eg.movieapp.data;
 
+import java.io.Serializable;
+
 /**
  * Created by ahmed on 25/12/15.
  */
-public class Movie {
+public class Movie implements Serializable {
     int id;
     String originalTitle;
 
@@ -12,7 +14,9 @@ public class Movie {
     //vote_average in the api
     String rating;
     //relative thumbnil link
-    String thumbnilLink;
+    String thumbnailRelativeLink;
+    final static String THUMBNAIL_BASE= "http://image.tmdb.org/t/p/";
+    final static String IMAGE_SIZE="w185";
     Movie(int id){
         this .id=id;
     }
@@ -24,16 +28,16 @@ public class Movie {
         this.overview = overview;
         this.releaseDate = releaseDate;
         this.rating = rating;
-        this.thumbnilLink = thumbnilLink;
+        this.thumbnailRelativeLink = thumbnilLink;
     }
 
 
-    public String getThumbnilLink() {
-        return thumbnilLink;
+    public String getThumbnailRelativeLink() {
+        return thumbnailRelativeLink;
     }
 
-    public void setThumbnilLink(String thumbnilLink) {
-        this.thumbnilLink = thumbnilLink;
+    public void setThumbnailRelativeLink(String thumbnailRelativeLink) {
+        this.thumbnailRelativeLink = thumbnailRelativeLink;
     }
 
     public int getId() {
@@ -83,6 +87,9 @@ public class Movie {
 
     @Override
     public String toString() {
-        return originalTitle+" "+thumbnilLink;
+        return originalTitle+" "+ thumbnailRelativeLink;
+    }
+    public String getImageUrl(){
+        return THUMBNAIL_BASE+IMAGE_SIZE+getThumbnailRelativeLink();
     }
 }

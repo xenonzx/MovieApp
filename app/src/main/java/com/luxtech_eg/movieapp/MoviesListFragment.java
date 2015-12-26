@@ -1,6 +1,7 @@
 package com.luxtech_eg.movieapp;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,8 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.AdapterView;
+import android.widget.GridView;
 
 import com.luxtech_eg.movieapp.data.Movie;
 
@@ -32,9 +33,9 @@ import java.util.ArrayList;
  */
 public class MoviesListFragment extends Fragment {
 
-    ListView moviesLV;
-    static ArrayList<String> moviesAL = new ArrayList<String>();
-    static ArrayAdapter <String> moviesAdapter;
+    GridView moviesLV;
+    static ArrayList<Movie> moviesAL = new ArrayList<Movie>();
+    static MoviesAdapter moviesAdapter;
 
     final static String APIKEY= "52665819dfedc14d67605e2bb09ed729";
     final static String TAG=MoviesListFragment.class.getSimpleName();
@@ -51,19 +52,30 @@ public class MoviesListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.movies_list_fragment_layout,container,false);
-        moviesLV= (ListView) rootView.findViewById(R.id.listview_movies);
-        moviesAdapter= new ArrayAdapter<String>(getActivity(),R.layout.list_item_movie,R.id.tv_movie_name,moviesAL);
+        moviesLV= (GridView) rootView.findViewById(R.id.listview_movies);
+        //TODO remove commented line after implementing your adapter correctly
+        //moviesAdapter= new ArrayAdapter<String>(getActivity(),R.layout.list_item_movie,R.id.tv_movie_title,moviesAL);
+        moviesAdapter= new MoviesAdapter(getActivity(),moviesAL);
         moviesLV.setAdapter(moviesAdapter);
         //TODO remove the following lines later start
         getPopularMovies();
         //// TODO: end
+        moviesLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Intent i = new Intent(getActivity(), DetailActivity.class);
+                i.putExtra(DetailFragment.MOVIE_OBJECT_KEY,moviesAL.get(position));
+                startActivity(i);
+            }
+        });
         return rootView;
     }
     void populateDummyData(){
-        moviesAL.add("hha1");
+        /*moviesAL.add("hha1");
         moviesAL.add("hha2");
         moviesAL.add("hha3");
         moviesAL.add("hha4");
+        */
 
     }
     void getPopularMovies() {
@@ -90,7 +102,7 @@ public class MoviesListFragment extends Fragment {
     }
 
     String buildTopRatedMoviesUri(){
-        //http://api.themoviedb.org/3/discover/movie?api_key=52665819dfedc14d67605e2bb09ed729&sort_by=vote_average.desc
+        //http://api.themoviedb.org/3/discover/movie?api_key=[]&sort_by=vote_average.desc
         Uri.Builder builder = new Uri.Builder();
         builder.scheme("http").authority("api.themoviedb.org")
                 .appendPath("3")
@@ -237,7 +249,8 @@ private static class FetchMoviesTask extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String moviesjson) {
         super.onPostExecute(moviesjson);
         try {
-            moviesAL=getMoviesFromJsonAsString(moviesjson);
+            //TODO solve empty layout bug
+            moviesAL=getMoviesFromJson(moviesjson);
             moviesAdapter.notifyDataSetChanged();
         } catch (JSONException e) {
             e.printStackTrace();
