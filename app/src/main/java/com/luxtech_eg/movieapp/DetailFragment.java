@@ -15,7 +15,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.luxtech_eg.movieapp.data.Movie;
+import com.luxtech_eg.movieapp.data.Video;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,9 +48,9 @@ public class DetailFragment extends Fragment {
     TextView rating;
     ListView videos;
     ListView reviews;
-    ArrayList<String> videosAL;
+    static ArrayList<Video> videosAL;
     ArrayList<String> reviewsAL;
-    ArrayAdapter videosAdapter;
+    static VideosAdapter videosAdapter;
     ArrayAdapter reviewsAdapter;
 
 
@@ -54,7 +59,7 @@ public class DetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         //TODO restore instance state if its a a must
         super.onCreate(savedInstanceState);
-        videosAL=new ArrayList<String>();
+        videosAL=new ArrayList<Video>();
     }
 
 
@@ -83,8 +88,10 @@ public class DetailFragment extends Fragment {
         favButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.v(TAG,"onClick");
                 //toggle state
                 if (isFavoriteMovie()) {
+
                     //toggle state undo favorite
                     unFavorite();
 
@@ -94,13 +101,15 @@ public class DetailFragment extends Fragment {
                 }
             }
         });
-        videosAdapter= new ArrayAdapter<String>( getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, videosAL );
+        videosAdapter= new VideosAdapter( getActivity(), videosAL );
+        videos.setAdapter(videosAdapter);
         // // TODO:  add transparency change to action bar
 
         getVideos();
         return rootView;
     }
     void getVideos(){
+        Log.v(TAG,"getVideos");
         String url = buildVideosUrl(m);
         new FetchMovieVideos().execute(url);
 
@@ -118,13 +127,15 @@ public class DetailFragment extends Fragment {
         return builder.build().toString();
     }
     private void unFavorite() {
-
+        Log.v(TAG,"unFavorite");
         //TODO add the Body of UnFavorite function and change iconon success
-        favButton.setImageResource(R.drawable.star_true);
+        favButton.setImageResource(R.drawable.star_false);
     }
     private void favorite() {
+        Log.v(TAG, "favorite");
         //TODO add the Body of favorite function
-        favButton.setImageResource(R.drawable.star_false);
+        favButton.setImageResource(R.drawable.star_true);
+
     }
 
     @Override
@@ -133,7 +144,8 @@ public class DetailFragment extends Fragment {
         super.onSaveInstanceState(outState);
     }
     boolean isFavoriteMovie(){
-        //todo add body to this function
+        //todo add body to this function get from db/sp
+        //
         //if(m.getId()is in favorits)
         return true;
     }
@@ -150,6 +162,7 @@ public class DetailFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... url) {
+            Log.v(TAG,"doInBackground");
             if (url.length == 0) {
                 // protection
                 return null;
@@ -212,9 +225,50 @@ public class DetailFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String s) {
+            Log.v(TAG,"onPostExecute");
             super.onPostExecute(s);
             Log.v(TAG,s);
             //// TODO: 26/12/15 add parsing to get youtube string
+            try {
+                videosAL.clear();
+                videosAL.addAll(getVideosFromJson(s));
+                videosAdapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+        private ArrayList<Video> getVideosFromJson(String videosJsonString) throws JSONException {
+            ArrayList<Video>returnedMoviesAl= new ArrayList<Video>();
+            Log.v(TAG,"getMoviesFromJson");
+
+            final String VIDEOS_RESULTS = "results";
+            final String VIDEOS_VIDEO_KEY = "key";
+            final String VIDEOS_VIDEO_NAME = "name";
+            final String VIDEOS_VIDEO_TYPE = "type";
+            final String VIDEOS_VIDEO_ID = "id";
+            final String VIDEOS_VIDEO_SITE = "site";
+
+
+
+
+            JSONObject videosJson = new JSONObject(videosJsonString);
+            JSONArray videosArray = videosJson.getJSONArray(VIDEOS_RESULTS);
+            //iterating over result movies
+            for(int i = 0; i < videosArray.length(); i++) {
+                JSONObject videoJsonObject= videosArray.getJSONObject(i);
+                Log.v(TAG,"movie object "+i+" "+videoJsonObject.toString());
+                // making an Movie object with the wanted attributes
+                Video m=new Video(videoJsonObject.getString(VIDEOS_VIDEO_ID),
+                        videoJsonObject.getString(VIDEOS_VIDEO_SITE),
+                        videoJsonObject.getString(VIDEOS_VIDEO_TYPE),
+                        videoJsonObject.getString(VIDEOS_VIDEO_NAME),
+                        videoJsonObject.getString(VIDEOS_VIDEO_KEY)
+                       );
+                returnedMoviesAl.add(m);
+            }
+            return returnedMoviesAl;
+
         }
     }
 

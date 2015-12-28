@@ -250,7 +250,9 @@ private static class FetchMoviesTask extends AsyncTask<String, Void, String> {
         super.onPostExecute(moviesjson);
         try {
             //TODO solve empty layout bug
-            moviesAL=getMoviesFromJson(moviesjson);
+            //moviesAL
+            moviesAL.clear();
+            moviesAL.addAll(getMoviesFromJson(moviesjson));
             moviesAdapter.notifyDataSetChanged();
         } catch (JSONException e) {
             e.printStackTrace();
