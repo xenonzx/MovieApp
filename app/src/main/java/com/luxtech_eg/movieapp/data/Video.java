@@ -6,13 +6,13 @@ import android.net.Uri;
  * Created by ahmed on 26/12/15.
  */
 public class Video {
-    String site;
-    String id;
-    String type;
-    String name;
-    String key;
-    final String YouTube_BASE_LINK="http://www.youtube.com/watch?v=";
-
+    private String site;
+    private String id;
+    private String type;
+    private String name;
+    private String key;
+    private final String YouTube_BASE_HTTP_LINK ="http://www.youtube.com/watch?v=";
+    private final String YouTube_BASE_VND_LINK ="vnd.youtube://";
     public Video(String id,String site, String type, String name, String key) {
         this.site = site;
         this.id = id;
@@ -62,8 +62,11 @@ public class Video {
         this.key = key;
     }
 
-    public Uri getYouTubeUri(){
-        return Uri.parse(YouTube_BASE_LINK+key);
+    public Uri getYouTubeHttpUri(){
+        return Uri.parse(YouTube_BASE_HTTP_LINK +key);
+    }
+    public Uri getYouTubeVndUri(){
+        return Uri.parse(YouTube_BASE_VND_LINK +key);
     }
 
 

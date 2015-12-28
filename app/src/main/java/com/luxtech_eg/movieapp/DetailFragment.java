@@ -124,13 +124,13 @@ public class DetailFragment extends Fragment {
     void playYouTubeVideo(Video video){
 
             try{
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube://" + video.getKey()));
+                Intent intent = new Intent(Intent.ACTION_VIEW, video.getYouTubeVndUri());
                 //intent.putExtra("VIDEO_ID", video.getKey());
                 startActivity(intent);
             }catch (ActivityNotFoundException ex){
                 Log.v(TAG, "activity not found exeption");
-                Log.v(TAG, "video uri is " + video.getYouTubeUri());
-                Intent intent=new Intent(Intent.ACTION_VIEW,video.getYouTubeUri());
+                Log.v(TAG, "video uri is " + video.getYouTubeHttpUri());
+                Intent intent=new Intent(Intent.ACTION_VIEW,video.getYouTubeHttpUri());
                 startActivity(intent);
             }
 
