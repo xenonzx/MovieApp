@@ -1,5 +1,7 @@
 package com.luxtech_eg.movieapp.data;
 
+import android.net.Uri;
+
 /**
  * Created by ahmed on 26/12/15.
  */
@@ -9,6 +11,7 @@ public class Video {
     String type;
     String name;
     String key;
+    final String YouTube_BASE_LINK="http://www.youtube.com/watch?v=";
 
     public Video(String id,String site, String type, String name, String key) {
         this.site = site;
@@ -57,6 +60,10 @@ public class Video {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public Uri getYouTubeUri(){
+        return Uri.parse(YouTube_BASE_LINK+key);
     }
 
 

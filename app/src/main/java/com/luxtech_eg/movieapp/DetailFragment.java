@@ -1,6 +1,8 @@
 package com.luxtech_eg.movieapp;
 
 import android.app.Fragment;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -88,7 +91,7 @@ public class DetailFragment extends Fragment {
         favButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.v(TAG,"onClick");
+                Log.v(TAG, "onClick");
                 //toggle state
                 if (isFavoriteMovie()) {
 
@@ -103,11 +106,37 @@ public class DetailFragment extends Fragment {
         });
         videosAdapter= new VideosAdapter( getActivity(), videosAL );
         videos.setAdapter(videosAdapter);
-        // // TODO:  add transparency change to action bar
+        videos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Log.v(TAG, "onItemClick");
+                Video video=videosAL.get(position);
+                Log.v(TAG, "site is "+video.getSite());
+                if(video.getSite().equals("YouTube")){
+                    playYouTubeVideo(video);
+                }
+            }
+        });
 
         getVideos();
         return rootView;
     }
+    void playYouTubeVideo(Video video){
+
+            try{
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube://" + video.getKey()));
+                //intent.putExtra("VIDEO_ID", video.getKey());
+                startActivity(intent);
+            }catch (ActivityNotFoundException ex){
+                Log.v(TAG, "activity not found exeption");
+                Log.v(TAG, "video uri is " + video.getYouTubeUri());
+                Intent intent=new Intent(Intent.ACTION_VIEW,video.getYouTubeUri());
+                startActivity(intent);
+            }
+
+    }
+
+    // // TODO:  add transparency change to action bar
     void getVideos(){
         Log.v(TAG,"getVideos");
         String url = buildVideosUrl(m);
