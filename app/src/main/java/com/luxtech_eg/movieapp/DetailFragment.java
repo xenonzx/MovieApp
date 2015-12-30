@@ -147,7 +147,7 @@ public class DetailFragment extends Fragment {
                 .appendPath("3")
                 .appendPath("movie")
                 .appendPath("" + movie.getId())
-                .appendPath("reviews")
+                .appendPath("videos")
                 .appendQueryParameter("api_key", APIKEY);
 
         return builder.build().toString();
@@ -159,7 +159,7 @@ public class DetailFragment extends Fragment {
                 .appendPath("3")
                 .appendPath("movie")
                 .appendPath("" + movie.getId())
-                .appendPath("videos")
+                .appendPath("reviews")
                 .appendQueryParameter("api_key", APIKEY );
 
         return builder.build().toString();
