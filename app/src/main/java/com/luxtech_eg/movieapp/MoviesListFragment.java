@@ -2,11 +2,16 @@ package com.luxtech_eg.movieapp;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -37,20 +42,38 @@ public class MoviesListFragment extends Fragment {
     static ArrayList<Movie> moviesAL = new ArrayList<Movie>();
     static MoviesAdapter moviesAdapter;
 
-    final static String APIKEY= "52665819dfedc14d67605e2bb09ed729";
+    final static String APIKEY= ApiKeyHolder.getAPIKEY();
     final static String TAG=MoviesListFragment.class.getSimpleName();
+    SharedPreferences sp;
 
     public MoviesListFragment(){
 
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.v(TAG,"onCreate");
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        sp= PreferenceManager.getDefaultSharedPreferences(getActivity());
+    }
+
+    @Override
+    public void onStart() {
+        Log.v(TAG,"onStart");
+        super.onStart();
+        getMovies();
+
+    }
+    @Override
+    public void onResume() {
+        Log.v(TAG,"onResume");
+        super.onResume();
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.v(TAG,"onCreateView");
         View rootView = inflater.inflate(R.layout.movies_list_fragment_layout,container,false);
         moviesLV= (GridView) rootView.findViewById(R.id.listview_movies);
         //TODO remove commented line after implementing your adapter correctly
@@ -58,7 +81,7 @@ public class MoviesListFragment extends Fragment {
         moviesAdapter= new MoviesAdapter(getActivity(),moviesAL);
         moviesLV.setAdapter(moviesAdapter);
         //TODO remove the following lines later start
-        getPopularMovies();
+
         //// TODO: end
         moviesLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -78,7 +101,24 @@ public class MoviesListFragment extends Fragment {
         */
 
     }
+    void getMovies(){
+        String key=getString(R.string.movies_sorting_key);
+        String defualtValue=getString(R.string.movies_sorting_default_value);
+        String popularMovies=getString(R.string.movies_sorting_popular );
+        String highestRatedMovies=getString(R.string.movies_sorting_highest_rated );
+
+        if(sp.getString(key,defualtValue).equals(popularMovies)){
+            getPopularMovies();
+        }
+        else if(sp.getString(key,defualtValue).equals(highestRatedMovies)) {
+            getTopRatedMovies();
+        }
+        else {
+            Log.e(TAG," niether popular nor top ");
+        }
+    }
     void getPopularMovies() {
+        Log.v(TAG,"getPopularMovies");
         String popMoviesUrl=buildPopularMoviesUri();
         Log.v(TAG,popMoviesUrl);
         FetchMoviesTask fmt= new FetchMoviesTask();
@@ -86,7 +126,11 @@ public class MoviesListFragment extends Fragment {
 
     }
     void getTopRatedMovies(){
-
+        Log.v(TAG,"getTopRatedMovies");
+        String top=buildTopRatedMoviesUri();
+        Log.v(TAG,top);
+        FetchMoviesTask fmt= new FetchMoviesTask();
+        fmt.execute(top);
     }
     String buildPopularMoviesUri(){
         //http://api.themoviedb.org/3/discover/movie?api_key=&sort_by=popularity.desc
@@ -114,7 +158,22 @@ public class MoviesListFragment extends Fragment {
         return builder.build().toString();
     }
 
-private static class FetchMoviesTask extends AsyncTask<String, Void, String> {
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.movie_list_menu,menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.settings){
+           startActivity(new Intent(getActivity(),SettingsActivity.class));
+           return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private static class FetchMoviesTask extends AsyncTask<String, Void, String> {
     final static String TAG= FetchMoviesTask.class.getSimpleName();
     //ArrayList<Movie> MoviesAL= new ArrayList<Movie>();
     @Override

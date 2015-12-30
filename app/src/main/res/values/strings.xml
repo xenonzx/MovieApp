@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">MovieApp</string>
+
+    <string name="movies_sorting_key">sort</string>
+    <string name="movies_sorting_title">Movies Sort </string>
+    <string name="movies_sorting_summery">choose how movies are displayed in home screen</string>
+    <string name="movies_sorting_default_value">pop</string>
+    <string name="movies_sorting_popular">pop</string>
+    <string name="movies_sorting_highest_rated">hi</string>
+
+    <string-array name="movie_sorting_entries">
+        <item>highest rated</item>
+        <item>most popular</item>
+    </string-array>
+    <string-array name="movie_sorting_values">
+        <item>hi</item>
+        <item>pop</item>
+    </string-array>
+
+    <string name="menu_settings_title">Settings</string>
+    <string name="prefs_fav_movies_json_key">fav_movies</string>
 </resources>

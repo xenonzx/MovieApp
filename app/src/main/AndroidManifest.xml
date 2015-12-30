@@ -18,6 +18,9 @@
         <activity android:name=".DetailActivity">
 
         </activity>
+        <activity android:name=".SettingsActivity"/>
+
+
     </application>
 
 </manifest>
