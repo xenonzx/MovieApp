@@ -10,6 +10,11 @@ public class Review {
     String content;
 
     public Review(String id,String author,String url,String content){
+        this.id=id;
+        this.author=author;
+        this.url=url;
+        this.content=content;
+
 
     }
     public String getAuthor() {

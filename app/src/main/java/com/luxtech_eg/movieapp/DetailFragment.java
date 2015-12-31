@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.luxtech_eg.movieapp.data.Movie;
+import com.luxtech_eg.movieapp.data.Review;
 import com.luxtech_eg.movieapp.data.Video;
 import com.squareup.picasso.Picasso;
 
@@ -43,8 +44,10 @@ public class DetailFragment extends Fragment {
     ListView videos;
     ListView reviews;
     static ArrayList<Video> videosAL;
-    ArrayList<String> reviewsAL;
+    static ArrayList<Review> reviewAL;
+
     static VideosAdapter videosAdapter;
+    static ReviewAdapter reviewAdapter;
     ArrayAdapter reviewsAdapter;
 
 
@@ -54,6 +57,7 @@ public class DetailFragment extends Fragment {
         //TODO restore instance state if its a a must
         super.onCreate(savedInstanceState);
         videosAL=new ArrayList<Video>();
+        reviewAL=new ArrayList<Review>();
     }
 
 
@@ -96,20 +100,24 @@ public class DetailFragment extends Fragment {
             }
         });
         videosAdapter= new VideosAdapter( getActivity(), videosAL );
+        reviewAdapter= new ReviewAdapter( getActivity(), reviewAL );
+
         videos.setAdapter(videosAdapter);
+        reviews.setAdapter(reviewAdapter);
         videos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Log.v(TAG, "onItemClick");
-                Video video=videosAL.get(position);
-                Log.v(TAG, "site is "+video.getSite());
-                if(video.getSite().equals("YouTube")){
+                Video video = videosAL.get(position);
+                Log.v(TAG, "site is " + video.getSite());
+                if (video.getSite().equals("YouTube")) {
                     playYouTubeVideo(video);
                 }
             }
         });
 
         getVideos();
+        getReviews();
         return rootView;
     }
     void playYouTubeVideo(Video video){
@@ -252,6 +260,7 @@ public class DetailFragment extends Fragment {
 
         }
     }
+
     static class FetchMovieReviews extends FetchTaskGET{
         String LogTag=FetchMovieReviews.class.getSimpleName();
         @Override
@@ -260,41 +269,56 @@ public class DetailFragment extends Fragment {
             super.setLogTAG(LogTag);
         }
 
-
-
-    }
-
-    private ArrayList<Video> getVideosFromJson(String videosJsonString) throws JSONException {
-        ArrayList<Video>returnedMoviesAl= new ArrayList<Video>();
-        Log.v(TAG,"getMoviesFromJson");
-
-        final String VIDEOS_RESULTS = "results";
-        final String VIDEOS_VIDEO_KEY = "key";
-        final String VIDEOS_VIDEO_NAME = "name";
-        final String VIDEOS_VIDEO_TYPE = "type";
-        final String VIDEOS_VIDEO_ID = "id";
-        final String VIDEOS_VIDEO_SITE = "site";
-
-
-
-
-        JSONObject videosJson = new JSONObject(videosJsonString);
-        JSONArray videosArray = videosJson.getJSONArray(VIDEOS_RESULTS);
-        //iterating over result movies
-        for(int i = 0; i < videosArray.length(); i++) {
-            JSONObject videoJsonObject= videosArray.getJSONObject(i);
-            Log.v(TAG,"movie object "+i+" "+videoJsonObject.toString());
-            // making an Movie object with the wanted attributes
-            Video m=new Video(videoJsonObject.getString(VIDEOS_VIDEO_ID),
-                    videoJsonObject.getString(VIDEOS_VIDEO_SITE),
-                    videoJsonObject.getString(VIDEOS_VIDEO_TYPE),
-                    videoJsonObject.getString(VIDEOS_VIDEO_NAME),
-                    videoJsonObject.getString(VIDEOS_VIDEO_KEY)
-            );
-            returnedMoviesAl.add(m);
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Log.v(LogTag, "onPostExecute");
+            super.onPostExecute(s);
+            Log.v(LogTag,s);
+            //// TODO: 26/12/15 add parsing to get youtube string
+            try {
+                reviewAL.clear();
+                reviewAL.addAll(getReviewsFromJson(s));
+                reviewAdapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
-        return returnedMoviesAl;
+        private ArrayList<Review> getReviewsFromJson(String reviewsJsonString) throws JSONException {
+            Log.v(TAG, "getReviewsFromJson");
+            ArrayList<Review>returnedReviewsAl= new ArrayList<Review>();
+
+
+            final String REVIEWS_RESULTS = "results";
+            final String REVIEWS_REVIEW_ID = "id";
+            final String REVIEWS_REVIEW_AUTHOR = "author";
+            final String REVIEWS_REVIEW_CONTENT = "content";
+            final String REVIEWS_REVIEW_URL = "url";
+
+
+
+
+
+            JSONObject reviewsJson = new JSONObject(reviewsJsonString);
+            JSONArray reviewsArray = reviewsJson.getJSONArray(REVIEWS_RESULTS);
+            //iterating over result movies
+            for(int i = 0; i < reviewsArray.length(); i++) {
+                JSONObject reviewJsonObject= reviewsArray.getJSONObject(i);
+                Log.v(TAG, "review object " + i + " " + reviewJsonObject.toString());
+                // making an Movie object with the wanted attributes
+                Review r=new Review( reviewJsonObject.getString(REVIEWS_REVIEW_ID),
+                        reviewJsonObject.getString(REVIEWS_REVIEW_AUTHOR),
+                        reviewJsonObject.getString(REVIEWS_REVIEW_URL),
+                        reviewJsonObject.getString(REVIEWS_REVIEW_CONTENT)
+
+                );
+                returnedReviewsAl.add(r);
+            }
+            return returnedReviewsAl;
+
+        }
 
     }
+
 
 }
