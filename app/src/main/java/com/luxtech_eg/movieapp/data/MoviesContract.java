@@ -12,7 +12,7 @@ public class MoviesContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_MOVIE = "movie";
 
-    public static class MovieEntry implements BaseColumns{
+    public static class FavoriteMovieEntry implements BaseColumns{
 
 
         // CONTENT_URI ="content://com.luxtech_eg.movieapp/movie"
@@ -22,13 +22,13 @@ public class MoviesContract {
         //ContentResolver.CURSOR_ITEM_BASE_TYPE Android platform's base MIME type for a content: URI containing a Cursor of a single item.
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
 
-        public static final String TABLE_NAME = "movie";
+        public static final String TABLE_NAME = "fav_movie";
 
         public static final String COLUMN_ORIGINAL_TITLE= "original_title";
         public static final String COLUMN_OVERVIEW = "overview";
         public static final String COLUMN_RELEASE_DATE = "releaseDate";
         public static final String COLUMN_RATING = "rating";
-        public static final String COLUMN_CITY_THUMN_RELATIVE_LINK ="thumbnailRelativeLink";
+        public static final String COLUMN_THUMB_RELATIVE_LINK ="thumbnailRelativeLink";
 
 
     }
