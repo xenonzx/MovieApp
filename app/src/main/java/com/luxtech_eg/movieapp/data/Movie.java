@@ -1,5 +1,7 @@
 package com.luxtech_eg.movieapp.data;
 
+import android.content.ContentValues;
+
 import java.io.Serializable;
 
 /**
@@ -89,7 +91,20 @@ public class Movie implements Serializable {
     public String toString() {
         return originalTitle+" "+ thumbnailRelativeLink;
     }
+
     public String getImageUrl(){
         return THUMBNAIL_BASE+IMAGE_SIZE+getThumbnailRelativeLink();
+    }
+
+    public ContentValues getInsertContentValues(){
+        ContentValues retMovieObject = new ContentValues();
+        retMovieObject.put(MoviesContract.FavoriteMovieEntry._ID,getId());
+        retMovieObject.put(MoviesContract.FavoriteMovieEntry.COLUMN_ORIGINAL_TITLE,getOriginalTitle());
+        retMovieObject.put(MoviesContract.FavoriteMovieEntry.COLUMN_OVERVIEW,getOverview());
+        retMovieObject.put(MoviesContract.FavoriteMovieEntry.COLUMN_RELEASE_DATE,getReleaseDate());
+        retMovieObject.put(MoviesContract.FavoriteMovieEntry.COLUMN_RATING,getRating());
+        retMovieObject.put(MoviesContract.FavoriteMovieEntry.COLUMN_THUMB_RELATIVE_LINK,getThumbnailRelativeLink());
+
+       return retMovieObject;
     }
 }

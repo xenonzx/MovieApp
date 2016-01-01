@@ -3,6 +3,8 @@ package com.luxtech_eg.movieapp;
 import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.luxtech_eg.movieapp.data.Movie;
+import com.luxtech_eg.movieapp.data.MoviesContract;
 import com.luxtech_eg.movieapp.data.Review;
 import com.luxtech_eg.movieapp.data.Video;
 import com.squareup.picasso.Picasso;
@@ -168,7 +171,7 @@ public class DetailFragment extends Fragment {
                 .appendPath("movie")
                 .appendPath("" + movie.getId())
                 .appendPath("reviews")
-                .appendQueryParameter("api_key", APIKEY );
+                .appendQueryParameter("api_key", APIKEY);
 
         return builder.build().toString();
     }
@@ -180,7 +183,10 @@ public class DetailFragment extends Fragment {
     private void favorite() {
         Log.v(TAG, "favorite");
         //TODO add the Body of favorite function
+        Uri inserted = getActivity().getContentResolver().insert(MoviesContract.FavoriteMovieEntry.CONTENT_URI,m.getInsertContentValues());
+        Log.v(TAG,inserted.toString());
         favButton.setImageResource(R.drawable.star_true);
+
 
     }
 
@@ -191,9 +197,13 @@ public class DetailFragment extends Fragment {
     }
     boolean isFavoriteMovie(){
         //todo add body to this function get from db/sp
-        //
-        //if(m.getId()is in favorits)
-        return true;
+        Uri movieUri = MoviesContract.FavoriteMovieEntry.buildFavoriteMovieUri(m.getId());
+
+            Cursor c = getActivity().getContentResolver().query(movieUri, null, null, null, null);
+            DatabaseUtils.dumpCursor(c);
+            // get the first item in cursor
+
+        return false;
     }
     void applyFavIconState(){
         // TODO change star icon to hart icon

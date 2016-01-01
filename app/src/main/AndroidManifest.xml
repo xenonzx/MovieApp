@@ -19,7 +19,9 @@
 
         </activity>
         <activity android:name=".SettingsActivity"/>
-
+        <provider
+            android:name="com.luxtech_eg.movieapp.data.FavoriteMoviesProvider"
+            android:authorities="com.luxtech_eg.movieapp" />
 
     </application>
 

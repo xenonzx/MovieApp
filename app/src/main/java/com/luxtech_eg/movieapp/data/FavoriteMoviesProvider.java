@@ -14,12 +14,17 @@ import android.support.annotation.Nullable;
 public class FavoriteMoviesProvider extends ContentProvider {
     // 1) initialize query matcher constants
     static final int FAVORITE_MOVIES = 100;
+    static final int FAVORITE_MOVIE_WITH_ID= 101;
+    private static final String sMovieIdSelection =
+            MoviesContract.FavoriteMovieEntry.TABLE_NAME+
+                    "." +MoviesContract.FavoriteMovieEntry._ID+ " = ? ";
 
 
     MoviesDbHelper mOpenHelper;
 
     //3) construct matcher from buildUriMatcher()
     private static final UriMatcher sUriMatcher = buildUriMatcher();
+
 
     @Override
     public boolean onCreate() {
@@ -37,6 +42,19 @@ public class FavoriteMoviesProvider extends ContentProvider {
             {
                 retCursor = mOpenHelper.getReadableDatabase().query(MoviesContract.FavoriteMovieEntry.TABLE_NAME
                         ,projection,selection,selectionArgs,null,null,sortOrder);
+                break;
+            }
+            case FAVORITE_MOVIE_WITH_ID:
+            {
+                long id=MoviesContract.FavoriteMovieEntry.getMovieIdFromUri(uri);
+                retCursor= mOpenHelper.getReadableDatabase().query(MoviesContract.FavoriteMovieEntry.TABLE_NAME,
+                        projection,
+                        sMovieIdSelection,
+                        new String[]{ Long.toString(id)},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             }
             default:
@@ -57,6 +75,8 @@ public class FavoriteMoviesProvider extends ContentProvider {
         switch (match) {
             case FAVORITE_MOVIES:
                 return MoviesContract.FavoriteMovieEntry.CONTENT_TYPE;
+            case FAVORITE_MOVIE_WITH_ID:
+                return MoviesContract.FavoriteMovieEntry.CONTENT_ITEM_TYPE;
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -72,6 +92,14 @@ public class FavoriteMoviesProvider extends ContentProvider {
 
         switch (match) {
             case FAVORITE_MOVIES:{
+                long _id = db.insert(MoviesContract.FavoriteMovieEntry.TABLE_NAME, null, contentValues);
+                if ( _id > 0 )
+                    returnUri = MoviesContract.FavoriteMovieEntry.buildFavoriteMovieUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case FAVORITE_MOVIE_WITH_ID:{
                 long _id = db.insert(MoviesContract.FavoriteMovieEntry.TABLE_NAME, null, contentValues);
                 if ( _id > 0 )
                     returnUri = MoviesContract.FavoriteMovieEntry.buildFavoriteMovieUri(_id);
@@ -98,6 +126,11 @@ public class FavoriteMoviesProvider extends ContentProvider {
             case FAVORITE_MOVIES:
                 rowsDeleted = db.delete(
                         MoviesContract.FavoriteMovieEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case FAVORITE_MOVIE_WITH_ID:
+                long id=MoviesContract.FavoriteMovieEntry.getMovieIdFromUri(uri);
+                rowsDeleted = db.delete(
+                        MoviesContract.FavoriteMovieEntry.TABLE_NAME, sMovieIdSelection, new String[]{ Long.toString(id)});
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -133,6 +166,7 @@ public class FavoriteMoviesProvider extends ContentProvider {
         final String authority = MoviesContract.CONTENT_AUTHORITY;
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, MoviesContract.PATH_MOVIE, FAVORITE_MOVIES);
+        matcher.addURI(authority, MoviesContract.PATH_MOVIE + "/*", FAVORITE_MOVIE_WITH_ID);
         /* in other cases
             * is a number
             # is a string

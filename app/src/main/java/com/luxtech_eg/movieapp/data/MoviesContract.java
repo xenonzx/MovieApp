@@ -31,8 +31,11 @@ public class MoviesContract {
         public static final String COLUMN_RATING = "rating";
         public static final String COLUMN_THUMB_RELATIVE_LINK ="thumbnailRelativeLink";
 
-        static Uri buildFavoriteMovieUri(long id){
+        public static Uri buildFavoriteMovieUri(long id){
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+        public static long getMovieIdFromUri(Uri uri){
+            return Long.parseLong(uri.getPathSegments().get(2));
         }
 
 
