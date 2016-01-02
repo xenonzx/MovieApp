@@ -190,20 +190,41 @@ public class DetailFragment extends Fragment {
 
     }
 
+
+    boolean isFavoriteMovie() {
+        //todo add body to this function get from db/sp
+        Uri movieUri = MoviesContract.FavoriteMovieEntry.buildFavoriteMovieUri(m.getId());
+
+        Cursor c = getActivity().getContentResolver().query(movieUri, null, null, null, null);
+        Log.v(TAG, "dumpCursor");
+        DatabaseUtils.dumpCursor(c);
+        if (c.getCount() == 0) {
+            Log.v(TAG, "This movie is NOT Favorite");
+            return false;
+        }
+        else {
+            if (c.getCount() == 1) {
+                Log.v(TAG, "This movie is Favorite");
+                return true;
+            }
+            else if (c.getCount() > 1) {
+                Log.v(TAG, "Duplication in data");
+                return true;
+            }
+            else if (c.getCount() > 1) {
+                Log.v(TAG, "isFavoriteMovie count is returning negative");
+                return true;
+            }
+            return true;
+        }
+
+    }
+
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         //Todo save instance state
         super.onSaveInstanceState(outState);
-    }
-    boolean isFavoriteMovie(){
-        //todo add body to this function get from db/sp
-        Uri movieUri = MoviesContract.FavoriteMovieEntry.buildFavoriteMovieUri(m.getId());
-
-            Cursor c = getActivity().getContentResolver().query(movieUri, null, null, null, null);
-            DatabaseUtils.dumpCursor(c);
-            // get the first item in cursor
-
-        return false;
     }
     void applyFavIconState(){
         // TODO change star icon to hart icon

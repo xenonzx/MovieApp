@@ -35,7 +35,7 @@ public class MoviesContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
         public static long getMovieIdFromUri(Uri uri){
-            return Long.parseLong(uri.getPathSegments().get(2));
+            return Long.parseLong(uri.getPathSegments().get(1));
         }
 
 
