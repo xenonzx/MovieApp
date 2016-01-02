@@ -45,6 +45,7 @@ public class MoviesListFragment extends Fragment {
     boolean ONLINE_MOVIES=false;
     String SHOW_FAV_MOVIES_KEY="show_fav_movies";
     GridView moviesLV;
+    Menu menu;
     static ArrayList<Movie> moviesAL = new ArrayList<Movie>();
     static MoviesAdapter moviesAdapter;
 
@@ -177,7 +178,15 @@ public class MoviesListFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.movie_list_menu,menu);
+        this.menu=menu;
+        if (showFavMovies==ONLINE_MOVIES) {
+            inflater.inflate(R.menu.movie_list_menu, menu);
+
+        }
+        else{
+            // this means showFavMovies==FAVORITE_MOVIES
+            inflater.inflate(R.menu.favorites_list_menu, menu);
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -190,7 +199,15 @@ public class MoviesListFragment extends Fragment {
         else if(item.getItemId()==R.id.menu_favorites){
             showFavMovies=FAVORITE_MOVIES;
             getMovies();
-
+            //update menu to be able to choose other case
+            onCreateOptionsMenu(this.menu, getActivity().getMenuInflater());
+            return true;
+        }
+        else if(item.getItemId()==R.id.menu_home){
+            showFavMovies=ONLINE_MOVIES;
+            getMovies();
+            //update menu to be able to choose other case
+            onCreateOptionsMenu(this.menu,getActivity().getMenuInflater());
             return true;
         }
         return super.onOptionsItemSelected(item);
