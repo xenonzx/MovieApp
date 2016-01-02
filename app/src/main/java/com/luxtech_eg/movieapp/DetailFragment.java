@@ -176,8 +176,11 @@ public class DetailFragment extends Fragment {
         return builder.build().toString();
     }
     private void unFavorite() {
-        Log.v(TAG,"unFavorite");
+        Log.v(TAG, "unFavorite");
         //TODO add the Body of UnFavorite function and change iconon success
+        Uri movieUri = MoviesContract.FavoriteMovieEntry.buildFavoriteMovieUri(m.getId());
+        int rowDeleted=getActivity().getContentResolver().delete(movieUri,null,null);
+        Log.v(TAG, "rowDeleted "+rowDeleted);
         favButton.setImageResource(R.drawable.star_false);
     }
     private void favorite() {

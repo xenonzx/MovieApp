@@ -8,7 +8,7 @@ import com.luxtech_eg.movieapp.data.MoviesContract.FavoriteMovieEntry;
 /**
  * Created by ahmed on 31/12/15.
  */
-public class MoviesDbHelper extends SQLiteOpenHelper {
+public class                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    MoviesDbHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION =1;
     public static final String DATABASE_NAME = "Movies.db";
 
@@ -30,9 +30,9 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
                 FavoriteMovieEntry.COLUMN_RATING + " TEXT NOT NULL, " +
                 FavoriteMovieEntry.COLUMN_THUMB_RELATIVE_LINK + " TEXT NOT NULL " +
                 " );";
-
+        //TODO add  field for saving images for  offline use
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIES_TABLE);
-
+                            
     }
     // onUpgrade()
     // 1)DROP TABLES

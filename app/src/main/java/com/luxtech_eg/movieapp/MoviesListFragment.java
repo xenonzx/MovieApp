@@ -3,6 +3,7 @@ package com.luxtech_eg.movieapp;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.luxtech_eg.movieapp.data.Movie;
+import com.luxtech_eg.movieapp.data.MoviesContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +35,8 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import static android.database.DatabaseUtils.dumpCursor;
+
 /**
  * Created by ahmed on 05/12/15.
  */
@@ -45,7 +49,8 @@ public class MoviesListFragment extends Fragment {
     final static String APIKEY= ApiKeyHolder.getAPIKEY();
     final static String TAG=MoviesListFragment.class.getSimpleName();
     SharedPreferences sp;
-
+    boolean showFavMovies=true;// this variable (showFavMovies)is to switch between retrieving favorite movies or using async task to getpopular or top rated movies
+    // todo add showFavMovies in on save and on restore and set it using meanu
     public MoviesListFragment(){
 
     }
@@ -59,14 +64,14 @@ public class MoviesListFragment extends Fragment {
 
     @Override
     public void onStart() {
-        Log.v(TAG,"onStart");
+        Log.v(TAG, "onStart");
         super.onStart();
         getMovies();
 
     }
     @Override
     public void onResume() {
-        Log.v(TAG,"onResume");
+        Log.v(TAG, "onResume");
         super.onResume();
     }
 
@@ -87,7 +92,7 @@ public class MoviesListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Intent i = new Intent(getActivity(), DetailActivity.class);
-                i.putExtra(DetailFragment.MOVIE_OBJECT_KEY,moviesAL.get(position));
+                i.putExtra(DetailFragment.MOVIE_OBJECT_KEY, moviesAL.get(position));
                 startActivity(i);
             }
         });
@@ -106,15 +111,20 @@ public class MoviesListFragment extends Fragment {
         String defualtValue=getString(R.string.movies_sorting_default_value);
         String popularMovies=getString(R.string.movies_sorting_popular );
         String highestRatedMovies=getString(R.string.movies_sorting_highest_rated );
+        if(showFavMovies){
 
-        if(sp.getString(key,defualtValue).equals(popularMovies)){
-            getPopularMovies();
-        }
-        else if(sp.getString(key,defualtValue).equals(highestRatedMovies)) {
-            getTopRatedMovies();
+            moviesAL.clear();
+            moviesAL.addAll(getFavoriteMovies());
+            moviesAdapter.notifyDataSetChanged();
         }
         else {
-            Log.e(TAG," niether popular nor top ");
+            if (sp.getString(key, defualtValue).equals(popularMovies)) {
+                getPopularMovies();
+            } else if (sp.getString(key, defualtValue).equals(highestRatedMovies)) {
+                getTopRatedMovies();
+            } else {
+                Log.e(TAG, " niether popular nor top ");
+            }
         }
     }
     void getPopularMovies() {
@@ -172,7 +182,35 @@ public class MoviesListFragment extends Fragment {
         }
         return super.onOptionsItemSelected(item);
     }
+    Cursor getFavoriteMoviesCursor(){
+        //Todo move to back a ground thread
+        Log.v(TAG,"getFavoriteMoviesCursor");
+        return getActivity().getContentResolver().query(MoviesContract.FavoriteMovieEntry.CONTENT_URI, null, null, null, null);
+    }
+    ArrayList<Movie>getFavoriteMovies(){
+        ArrayList<Movie> retMovies= new ArrayList<Movie>();
+        //parse the cursor row into Movie object
+        Cursor movieCursor = getFavoriteMoviesCursor();
+        // Todo  remove dumpcursor
+        dumpCursor(movieCursor);
+        // loop over cursor
+        if (movieCursor.moveToFirst()){
+            //note to self
+            do{
+                int id=movieCursor.getInt(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry._ID));
+                String title = movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_ORIGINAL_TITLE));
+                String overview = movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_OVERVIEW));
+                String rating = movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_RATING));
+                String releaseDate = movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_RELEASE_DATE));
+                String thumRelativeLink= movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_THUMB_RELATIVE_LINK));
+                Movie m= new Movie(id,title,overview,releaseDate,rating,thumRelativeLink);
+                retMovies.add(m);
+            }while(movieCursor.moveToNext());
+        }
+        movieCursor.close();
 
+        return retMovies;
+    }
     private static class FetchMoviesTask extends AsyncTask<String, Void, String> {
     final static String TAG= FetchMoviesTask.class.getSimpleName();
     //ArrayList<Movie> MoviesAL= new ArrayList<Movie>();
