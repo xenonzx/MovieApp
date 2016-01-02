@@ -200,6 +200,7 @@ public class MoviesListFragment extends Fragment {
             showFavMovies=FAVORITE_MOVIES;
             getMovies();
             //update menu to be able to choose other case
+            this.menu.clear();
             onCreateOptionsMenu(this.menu, getActivity().getMenuInflater());
             return true;
         }
@@ -207,7 +208,8 @@ public class MoviesListFragment extends Fragment {
             showFavMovies=ONLINE_MOVIES;
             getMovies();
             //update menu to be able to choose other case
-            onCreateOptionsMenu(this.menu,getActivity().getMenuInflater());
+            this.menu.clear();
+            onCreateOptionsMenu(this.menu, getActivity().getMenuInflater());
             return true;
         }
         return super.onOptionsItemSelected(item);
