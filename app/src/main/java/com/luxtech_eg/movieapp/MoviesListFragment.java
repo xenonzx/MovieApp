@@ -193,28 +193,29 @@ public class MoviesListFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId()==R.id.settings){
-           startActivity(new Intent(getActivity(),SettingsActivity.class));
+           startActivity(new Intent(getActivity(), SettingsActivity.class));
            return true;
         }
         else if(item.getItemId()==R.id.menu_favorites){
             showFavMovies=FAVORITE_MOVIES;
             getMovies();
-            //update menu to be able to choose other case
-            this.menu.clear();
-            onCreateOptionsMenu(this.menu, getActivity().getMenuInflater());
+            updateMenu();
             return true;
         }
         else if(item.getItemId()==R.id.menu_home){
             showFavMovies=ONLINE_MOVIES;
             getMovies();
-            //update menu to be able to choose other case
-            this.menu.clear();
-            onCreateOptionsMenu(this.menu, getActivity().getMenuInflater());
+            updateMenu();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    void updateMenu(){
+        //update menu to be able to choose other case
+        this.menu.clear();
+        onCreateOptionsMenu(this.menu, getActivity().getMenuInflater());
+    }
     @Override
     public void onSaveInstanceState(Bundle outState) {
 
