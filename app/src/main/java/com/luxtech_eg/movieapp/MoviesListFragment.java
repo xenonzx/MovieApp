@@ -41,7 +41,9 @@ import static android.database.DatabaseUtils.dumpCursor;
  * Created by ahmed on 05/12/15.
  */
 public class MoviesListFragment extends Fragment {
-
+    boolean FAVORITE_MOVIES=true;
+    boolean ONLINE_MOVIES=false;
+    String SHOW_FAV_MOVIES_KEY="show_fav_movies";
     GridView moviesLV;
     static ArrayList<Movie> moviesAL = new ArrayList<Movie>();
     static MoviesAdapter moviesAdapter;
@@ -49,7 +51,7 @@ public class MoviesListFragment extends Fragment {
     final static String APIKEY= ApiKeyHolder.getAPIKEY();
     final static String TAG=MoviesListFragment.class.getSimpleName();
     SharedPreferences sp;
-    boolean showFavMovies=true;// this variable (showFavMovies)is to switch between retrieving favorite movies or using async task to getpopular or top rated movies
+    boolean showFavMovies;// this variable (showFavMovies)is to switch between retrieving favorite movies or using async task to getpopular or top rated movies
     // todo add showFavMovies in on save and on restore and set it using meanu
     public MoviesListFragment(){
 
@@ -60,6 +62,7 @@ public class MoviesListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         sp= PreferenceManager.getDefaultSharedPreferences(getActivity());
+        showFavMovies=ONLINE_MOVIES;
     }
 
     @Override
@@ -78,6 +81,10 @@ public class MoviesListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            showFavMovies = savedInstanceState.getBoolean(SHOW_FAV_MOVIES_KEY);
+            Log.d(TAG,"savedInstanceState of showFavMovies " +showFavMovies);
+        }
         Log.v(TAG,"onCreateView");
         View rootView = inflater.inflate(R.layout.movies_list_fragment_layout,container,false);
         moviesLV= (GridView) rootView.findViewById(R.id.listview_movies);
@@ -180,8 +187,23 @@ public class MoviesListFragment extends Fragment {
            startActivity(new Intent(getActivity(),SettingsActivity.class));
            return true;
         }
+        else if(item.getItemId()==R.id.menu_favorites){
+            showFavMovies=FAVORITE_MOVIES;
+            getMovies();
+
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        outState.putBoolean(SHOW_FAV_MOVIES_KEY,showFavMovies);
+        super.onSaveInstanceState(outState);
+    }
+
+
     Cursor getFavoriteMoviesCursor(){
         //Todo move to back a ground thread
         Log.v(TAG,"getFavoriteMoviesCursor");
