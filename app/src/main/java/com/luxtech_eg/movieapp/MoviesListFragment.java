@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.luxtech_eg.movieapp.data.Movie;
 import com.luxtech_eg.movieapp.data.MoviesContract;
@@ -46,6 +47,7 @@ public class MoviesListFragment extends Fragment {
     String SHOW_FAV_MOVIES_KEY="show_fav_movies";
     GridView moviesLV;
     Menu menu;
+
     static ArrayList<Movie> moviesAL = new ArrayList<Movie>();
     static MoviesAdapter moviesAdapter;
 
@@ -54,6 +56,8 @@ public class MoviesListFragment extends Fragment {
     SharedPreferences sp;
     boolean showFavMovies;// this variable (showFavMovies)is to switch between retrieving favorite movies or using async task to getpopular or top rated movies
     // todo add showFavMovies in on save and on restore and set it using meanu
+    ConnectionDetector connectionDetector;
+
     public MoviesListFragment(){
 
     }
@@ -64,6 +68,7 @@ public class MoviesListFragment extends Fragment {
         setHasOptionsMenu(true);
         sp= PreferenceManager.getDefaultSharedPreferences(getActivity());
         showFavMovies=ONLINE_MOVIES;
+        connectionDetector=new ConnectionDetector(getActivity());
     }
 
     @Override
@@ -126,12 +131,19 @@ public class MoviesListFragment extends Fragment {
             moviesAdapter.notifyDataSetChanged();
         }
         else {
-            if (sp.getString(key, defualtValue).equals(popularMovies)) {
-                getPopularMovies();
-            } else if (sp.getString(key, defualtValue).equals(highestRatedMovies)) {
-                getTopRatedMovies();
-            } else {
-                Log.e(TAG, " niether popular nor top ");
+            if(connectionDetector.isConnectingToInternet()) {
+                //if there is connection to internet get movies
+                if (sp.getString(key, defualtValue).equals(popularMovies)) {
+                    getPopularMovies();
+                } else if (sp.getString(key, defualtValue).equals(highestRatedMovies)) {
+                    getTopRatedMovies();
+                } else {
+                    Log.e(TAG, " niether popular nor top ");
+                }
+            }
+            else {
+                Toast.makeText(getActivity(),R.string.toast_message_no_internet,Toast.LENGTH_LONG).show();
+
             }
         }
     }
