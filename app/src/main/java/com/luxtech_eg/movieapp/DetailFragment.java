@@ -201,7 +201,7 @@ public class DetailFragment extends Fragment {
 
 
     }
-    String saveMovieThumbToObject(){
+    void saveMovieThumbToObject(){
         String retBase64;
         Picasso.with(getActivity()).load(m.getImageUrl()).into(new Target() {
             @Override
