@@ -49,6 +49,7 @@ public class MoviesAdapter extends BaseAdapter {
         ImageView thumb=(ImageView)view.findViewById(R.id.iv_movie_thumb);
         //title.setText(movieArrayList.get(position).getOriginalTitle());
         Picasso.with(mContext).load(movieArrayList.get(position).getImageUrl()).into(thumb);
+
         //thumb.setImageResource(R.drawable.temp);
         return view;
     }

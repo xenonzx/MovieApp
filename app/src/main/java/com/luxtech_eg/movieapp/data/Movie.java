@@ -15,6 +15,10 @@ public class Movie implements Serializable {
     String releaseDate;
     //vote_average in the api
     String rating;
+
+
+
+    String imageBase64;
     //relative thumbnil link
     String thumbnailRelativeLink;
     final static String THUMBNAIL_BASE= "http://image.tmdb.org/t/p/";
@@ -104,7 +108,15 @@ public class Movie implements Serializable {
         retMovieObject.put(MoviesContract.FavoriteMovieEntry.COLUMN_RELEASE_DATE,getReleaseDate());
         retMovieObject.put(MoviesContract.FavoriteMovieEntry.COLUMN_RATING,getRating());
         retMovieObject.put(MoviesContract.FavoriteMovieEntry.COLUMN_THUMB_RELATIVE_LINK,getThumbnailRelativeLink());
+        retMovieObject.put(MoviesContract.FavoriteMovieEntry.COLUMN_THUMB_BASE_64,getImageBase64());
 
        return retMovieObject;
+    }
+    public String getImageBase64() {
+        return imageBase64;
+    }
+
+    public void setImageBase64(String imageBase64) {
+        this.imageBase64 = imageBase64;
     }
 }

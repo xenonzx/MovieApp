@@ -5,8 +5,11 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,11 +26,13 @@ import com.luxtech_eg.movieapp.data.MoviesContract;
 import com.luxtech_eg.movieapp.data.Review;
 import com.luxtech_eg.movieapp.data.Video;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 /**
@@ -186,12 +191,39 @@ public class DetailFragment extends Fragment {
     private void favorite() {
         Log.v(TAG, "favorite");
         //TODO add the Body of favorite function
+        //once a movie is favorited its image bitmap is converted to base64 formate and base 64 string is added to object to be inserted into db
+        // i used setImageBase64 here so content values returned from getInsertContentValues conains image value
+
+        saveMovieThumbToObject();
         Uri inserted = getActivity().getContentResolver().insert(MoviesContract.FavoriteMovieEntry.CONTENT_URI,m.getInsertContentValues());
         Log.v(TAG,inserted.toString());
         favButton.setImageResource(R.drawable.star_true);
 
 
     }
+    String saveMovieThumbToObject(){
+        String retBase64;
+        Picasso.with(getActivity()).load(m.getImageUrl()).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                ByteArrayOutputStream bao = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bao);
+                byte [] ba = bao.toByteArray();
+                m.setImageBase64(Base64.encodeToString(ba, Base64.DEFAULT));
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+            // todo add temp Bimap
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
+    }
+
 
 
     boolean isFavoriteMovie() {
