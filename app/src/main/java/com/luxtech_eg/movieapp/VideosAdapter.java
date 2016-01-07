@@ -42,8 +42,8 @@ public class VideosAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View view, ViewGroup viewGroup) {
-        view= layoutInflater.inflate(android.R.layout.simple_list_item_1,viewGroup,false);
-        TextView videoName=(TextView)view.findViewById(android.R.id.text1);
+        view= layoutInflater.inflate(R.layout.list_item_video,viewGroup,false);
+        TextView videoName=(TextView)view.findViewById(R.id.tv_video_title);
         videoName.setText(videoArrayList.get(position).getName());
         return view;
     }

@@ -4,10 +4,13 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,12 +24,15 @@ import android.widget.Toast;
 
 import com.luxtech_eg.movieapp.data.Movie;
 import com.luxtech_eg.movieapp.data.MoviesContract;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -42,8 +48,8 @@ import static android.database.DatabaseUtils.dumpCursor;
  * Created by ahmed on 05/12/15.
  */
 public class MoviesListFragment extends Fragment {
-    boolean FAVORITE_MOVIES=true;
-    boolean ONLINE_MOVIES=false;
+    public final static boolean FAVORITE_MOVIES=true;
+    public final static boolean ONLINE_MOVIES=false;
     String SHOW_FAV_MOVIES_KEY="show_fav_movies";
     GridView moviesLV;
     Menu menu;
@@ -105,20 +111,35 @@ public class MoviesListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Intent i = new Intent(getActivity(), DetailActivity.class);
-                i.putExtra(DetailFragment.MOVIE_OBJECT_KEY, moviesAL.get(position));
+                //compromise : badal ma ageeb el base64 images for every item in arraylist i setit once on item clicked
+                // compromise 7elwa compromise deh
+                final Movie m= moviesAL.get(position);
+                Picasso.with(getActivity()).load(m.getImageUrl()).into(new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        ByteArrayOutputStream bao = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bao);
+                        byte [] ba = bao.toByteArray();
+                        m.setImageBase64(Base64.encodeToString(ba, Base64.DEFAULT));
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Drawable errorDrawable) {
+                        // todo add temp Bimap
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                    }
+                });
+                i.putExtra(DetailFragment.MOVIE_OBJECT_KEY, m);
                 startActivity(i);
             }
         });
         return rootView;
     }
-    void populateDummyData(){
-        /*moviesAL.add("hha1");
-        moviesAL.add("hha2");
-        moviesAL.add("hha3");
-        moviesAL.add("hha4");
-        */
 
-    }
     void getMovies(){
         String key=getString(R.string.movies_sorting_key);
         String defualtValue=getString(R.string.movies_sorting_default_value);
@@ -128,6 +149,7 @@ public class MoviesListFragment extends Fragment {
 
             moviesAL.clear();
             moviesAL.addAll(getFavoriteMovies());
+            moviesAdapter.setShowFavMovies(FAVORITE_MOVIES);
             moviesAdapter.notifyDataSetChanged();
         }
         else {
@@ -184,6 +206,7 @@ public class MoviesListFragment extends Fragment {
                 .appendPath("movie")
                 .appendQueryParameter("api_key", APIKEY )
                 .appendQueryParameter("sort_by", "vote_average.desc");
+
 
         return builder.build().toString();
     }
@@ -257,7 +280,8 @@ public class MoviesListFragment extends Fragment {
                 String rating = movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_RATING));
                 String releaseDate = movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_RELEASE_DATE));
                 String thumRelativeLink= movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_THUMB_RELATIVE_LINK));
-                Movie m= new Movie(id,title,overview,releaseDate,rating,thumRelativeLink);
+                String base64image= movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_THUMB_BASE_64));
+                Movie m= new Movie(id,title,overview,releaseDate,rating,thumRelativeLink,base64image);
                 retMovies.add(m);
             }while(movieCursor.moveToNext());
         }
@@ -266,149 +290,151 @@ public class MoviesListFragment extends Fragment {
         return retMovies;
     }
     private static class FetchMoviesTask extends AsyncTask<String, Void, String> {
-    final static String TAG= FetchMoviesTask.class.getSimpleName();
-    //ArrayList<Movie> MoviesAL= new ArrayList<Movie>();
-    @Override
+        final static String TAG= FetchMoviesTask.class.getSimpleName();
+        //ArrayList<Movie> MoviesAL= new ArrayList<Movie>();
+        @Override
 
-    protected String doInBackground(String... url) {
-        if (url.length == 0) {
-            // protection
-            return null;
-        }
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-        String moviesJson;
-        try{
-            URL apiUrl=new URL(url[0]);
-            Log.v(TAG," url passedto AsyncTask"+url[0]);
-            urlConnection = (HttpURLConnection) apiUrl.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-            // Read the input stream into a String
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                // Nothing to do.
-                Log.v(TAG,"no input stream");
+        protected String doInBackground(String... url) {
+            if (url.length == 0) {
+                // protection
                 return null;
             }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                // But it does make debugging a *lot* easier if you print out the completed
-                // buffer for debugging.
-                buffer.append(line + "\n");
-            }
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+            String moviesJson;
+            try{
+                URL apiUrl=new URL(url[0]);
+                Log.v(TAG," url passedto AsyncTask"+url[0]);
+                urlConnection = (HttpURLConnection) apiUrl.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+                // Read the input stream into a String
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    Log.v(TAG,"no input stream");
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
 
-            if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                return null;
-            }
-            moviesJson=buffer.toString();
-            return moviesJson;
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    return null;
+                }
+                moviesJson=buffer.toString();
+                return moviesJson;
 
 
-        }catch (MalformedURLException e) {
-            Log.e(TAG,"MalformedURLException");
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e(TAG, "Error closing stream", e);
+            }catch (MalformedURLException e) {
+                Log.e(TAG,"MalformedURLException");
+                e.printStackTrace();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e(TAG, "Error closing stream", e);
+                    }
                 }
             }
+            return null;
         }
-        return null;
-    }
 
-    private ArrayList<Movie> getMoviesFromJson(String moviesJsonString) throws JSONException {
-        ArrayList<Movie>returnedMoviesAl= new ArrayList<Movie>();
-        Log.v(TAG,"getMoviesFromJson");
+        private ArrayList<Movie> getMoviesFromJson(String moviesJsonString) throws JSONException {
+            ArrayList<Movie>returnedMoviesAl= new ArrayList<Movie>();
+            Log.v(TAG,"getMoviesFromJson");
 
-        final String MOVIE_RESULT_LIST = "results";
-        final String MOVIE_THUMBNIL_RELATIVE_PATH = "poster_path";
-        final String MOVIE_TITLE = "title";
-        final String MOVIE_OVERVIEW = "overview";
-        final String MOVIE_ID = "id";
-        final String MOVIE_RATING="vote_average";
-        final String MOVIE_RELEASE_DATE="release_date";
+            final String MOVIE_RESULT_LIST = "results";
+            final String MOVIE_THUMBNIL_RELATIVE_PATH = "poster_path";
+            final String MOVIE_TITLE = "title";
+            final String MOVIE_OVERVIEW = "overview";
+            final String MOVIE_ID = "id";
+            final String MOVIE_RATING="vote_average";
+            final String MOVIE_RELEASE_DATE="release_date";
 
 
 
-        JSONObject moviesJson = new JSONObject(moviesJsonString);
-        JSONArray resultsArray = moviesJson.getJSONArray(MOVIE_RESULT_LIST);
-        //iterating over result movies
-        for(int i = 0; i < resultsArray.length(); i++) {
-            JSONObject movieJsonObj= resultsArray.getJSONObject(i);
-            Log.v(TAG,"movie object "+i+" "+movieJsonObj.toString());
-            // making an Movie object with the wanted attributes
-            Movie m=new Movie(movieJsonObj.getInt(MOVIE_ID),
-                    movieJsonObj.getString(MOVIE_TITLE),
-                    movieJsonObj.getString(MOVIE_OVERVIEW),
-                    movieJsonObj.getString(MOVIE_RELEASE_DATE),
-                    movieJsonObj.getString(MOVIE_RATING),
-                    movieJsonObj.getString(MOVIE_THUMBNIL_RELATIVE_PATH));
-            returnedMoviesAl.add(m);
+            JSONObject moviesJson = new JSONObject(moviesJsonString);
+            JSONArray resultsArray = moviesJson.getJSONArray(MOVIE_RESULT_LIST);
+            //iterating over result movies
+            for(int i = 0; i < resultsArray.length(); i++) {
+                JSONObject movieJsonObj= resultsArray.getJSONObject(i);
+                Log.v(TAG,"movie object "+i+" "+movieJsonObj.toString());
+                // making an Movie object with the wanted attributes
+                Movie m=new Movie(movieJsonObj.getInt(MOVIE_ID),
+                        movieJsonObj.getString(MOVIE_TITLE),
+                        movieJsonObj.getString(MOVIE_OVERVIEW),
+                        movieJsonObj.getString(MOVIE_RELEASE_DATE),
+                        movieJsonObj.getString(MOVIE_RATING),
+                        movieJsonObj.getString(MOVIE_THUMBNIL_RELATIVE_PATH));
+                returnedMoviesAl.add(m);
+            }
+            return returnedMoviesAl;
+
         }
-        return returnedMoviesAl;
+        private ArrayList<String> getMoviesFromJsonAsString(String moviesJsonString) throws JSONException {
+            ArrayList<String>returnedMoviesAl= new ArrayList<String>();
+            Log.v(TAG,"getMoviesFromJson");
 
-    }
-    private ArrayList<String> getMoviesFromJsonAsString(String moviesJsonString) throws JSONException {
-        ArrayList<String>returnedMoviesAl= new ArrayList<String>();
-        Log.v(TAG,"getMoviesFromJson");
-
-        final String MOVIE_RESULT_LIST = "results";
-        final String MOVIE_THUMBNIL_RELATIVE_PATH = "poster_path";
-        final String MOVIE_TITLE = "title";
-        final String MOVIE_OVERVIEW = "overview";
-        final String MOVIE_ID = "id";
-        final String MOVIE_RATING="vote_average";
-        final String MOVIE_RELEASE_DATE="release_date";
+            final String MOVIE_RESULT_LIST = "results";
+            final String MOVIE_THUMBNIL_RELATIVE_PATH = "poster_path";
+            final String MOVIE_TITLE = "title";
+            final String MOVIE_OVERVIEW = "overview";
+            final String MOVIE_ID = "id";
+            final String MOVIE_RATING="vote_average";
+            final String MOVIE_RELEASE_DATE="release_date";
 
 
 
-        JSONObject moviesJson = new JSONObject(moviesJsonString);
-        JSONArray resultsArray = moviesJson.getJSONArray(MOVIE_RESULT_LIST);
-        //iterating over result movies
-        for(int i = 0; i < resultsArray.length(); i++) {
-            JSONObject movieJsonObj= resultsArray.getJSONObject(i);
-            Log.v(TAG,"movie object "+i+" "+movieJsonObj.toString());
-            // making an Movie object with the wanted attributes
-            Movie m=new Movie(movieJsonObj.getInt(MOVIE_ID),
-                    movieJsonObj.getString(MOVIE_TITLE),
-                    movieJsonObj.getString(MOVIE_OVERVIEW),
-                    movieJsonObj.getString(MOVIE_RELEASE_DATE),
-                    movieJsonObj.getString(MOVIE_RATING),
-                    movieJsonObj.getString(MOVIE_THUMBNIL_RELATIVE_PATH));
-            returnedMoviesAl.add(m.toString());
+            JSONObject moviesJson = new JSONObject(moviesJsonString);
+            JSONArray resultsArray = moviesJson.getJSONArray(MOVIE_RESULT_LIST);
+            //iterating over result movies
+            for(int i = 0; i < resultsArray.length(); i++) {
+                JSONObject movieJsonObj= resultsArray.getJSONObject(i);
+                Log.v(TAG,"movie object "+i+" "+movieJsonObj.toString());
+                // making an Movie object with the wanted attributes
+                Movie m=new Movie(movieJsonObj.getInt(MOVIE_ID),
+                        movieJsonObj.getString(MOVIE_TITLE),
+                        movieJsonObj.getString(MOVIE_OVERVIEW),
+                        movieJsonObj.getString(MOVIE_RELEASE_DATE),
+                        movieJsonObj.getString(MOVIE_RATING),
+                        movieJsonObj.getString(MOVIE_THUMBNIL_RELATIVE_PATH));
+                returnedMoviesAl.add(m.toString());
+            }
+            return returnedMoviesAl;
+
         }
-        return returnedMoviesAl;
 
-    }
+        @Override
+        protected void onPostExecute(String moviesjson) {
+            super.onPostExecute(moviesjson);
+            try {
+                //TODO solve empty layout bug
+                //moviesAL
 
-    @Override
-    protected void onPostExecute(String moviesjson) {
-        super.onPostExecute(moviesjson);
-        try {
-            //TODO solve empty layout bug
-            //moviesAL
-            moviesAL.clear();
-            moviesAL.addAll(getMoviesFromJson(moviesjson));
-            moviesAdapter.notifyDataSetChanged();
-        } catch (JSONException e) {
-            e.printStackTrace();
+                moviesAL.clear();
+                moviesAL.addAll(getMoviesFromJson(moviesjson));
+                moviesAdapter.setShowFavMovies(ONLINE_MOVIES);
+                moviesAdapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
-}
 
 }

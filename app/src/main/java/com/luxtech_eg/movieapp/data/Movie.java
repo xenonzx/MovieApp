@@ -1,6 +1,9 @@
 package com.luxtech_eg.movieapp.data;
 
 import android.content.ContentValues;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 
 import java.io.Serializable;
 
@@ -35,6 +38,16 @@ public class Movie implements Serializable {
         this.releaseDate = releaseDate;
         this.rating = rating;
         this.thumbnailRelativeLink = thumbnilLink;
+    }
+    public Movie(int id, String originalTitle,  String overview, String releaseDate, String rating, String thumbnilLink,String base65Image) {
+        this.id = id;
+        this.originalTitle = originalTitle;
+
+        this.overview = overview;
+        this.releaseDate = releaseDate;
+        this.rating = rating;
+        this.thumbnailRelativeLink = thumbnilLink;
+        this.imageBase64=base65Image;
     }
 
 
@@ -117,6 +130,12 @@ public class Movie implements Serializable {
     }
 
     public void setImageBase64(String imageBase64) {
+
         this.imageBase64 = imageBase64;
+    }
+    public Bitmap getMoviePoster(){
+        byte[] decodedString = Base64.decode(this.imageBase64, Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        return  decodedByte;
     }
 }

@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.luxtech_eg.movieapp.data.Movie;
 import com.luxtech_eg.movieapp.data.MoviesContract;
@@ -58,7 +59,7 @@ public class DetailFragment extends Fragment {
     static ReviewAdapter reviewAdapter;
     ArrayAdapter reviewsAdapter;
 
-
+    ConnectionDetector connectionDetector;
     Movie m;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +67,8 @@ public class DetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         videosAL=new ArrayList<Video>();
         reviewAL=new ArrayList<Review>();
+        connectionDetector= new ConnectionDetector(getActivity());
+
     }
 
 
@@ -89,7 +92,9 @@ public class DetailFragment extends Fragment {
         overview.setText(m.getOverview());
         rating.setText(m.getRating());
         releaseDate.setText(m.getReleaseDate());
-        Picasso.with(getActivity()).load(m.getImageUrl()).into(movieThumb);
+        //// TODO: add if temp image ,get poster from api
+        //Picasso.with(getActivity()).load(m.getImageUrl()).into(movieThumb);
+        movieThumb.setImageBitmap(m.getMoviePoster());
         applyFavIconState();
         favButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,9 +128,7 @@ public class DetailFragment extends Fragment {
                 }
             }
         });
-
-        getVideos();
-        getReviews();
+        getVideoAndReviews();
         return rootView;
     }
     void playYouTubeVideo(Video video){
@@ -142,7 +145,15 @@ public class DetailFragment extends Fragment {
             }
 
     }
-
+    void getVideoAndReviews(){
+        if(connectionDetector.isConnectingToInternet()){
+            getVideos();
+            getReviews();
+        }
+        else{
+            Toast.makeText(getActivity(),R.string.toast_message_no_internet_no_videos_no_reviews,Toast.LENGTH_LONG).show();
+        }
+    }
     // // TODO:  add transparency change to action bar
     void getVideos(){
         Log.v(TAG,"getVideos");

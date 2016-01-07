@@ -23,4 +23,5 @@
     <string name="prefs_fav_movies_json_key">fav_movies</string>
 
     <string name="toast_message_no_internet">no internet connection</string>
+    <string name="toast_message_no_internet_no_videos_no_reviews">no internet connection cant fetch videos and Reviews</string>
 </resources>

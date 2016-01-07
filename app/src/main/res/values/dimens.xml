@@ -5,5 +5,6 @@
     <dimen name="gridview_col_width">185dp</dimen>
     <dimen name="girdview_vertical_spacing">0dp</dimen>
     <dimen name="girdview_horizontal_spacing">0dp</dimen>
-    <dimen name="favorite_star_icon_Size">64dp</dimen>
+    <dimen name="favorite_star_icon_size">64dp</dimen>
+    <dimen name="trailer_play_icon_size">64dp</dimen>
 </resources>
