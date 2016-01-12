@@ -16,11 +16,17 @@ public class MoviesListActivity extends AppCompatActivity{
         }else{
             twoPane=false;
         }
+
         if (savedInstanceState == null) {
             //master fragment
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new MoviesListFragment())
                     .commit();
+            if (twoPane) {
+                getFragmentManager().beginTransaction()
+                        .add(R.id.detail_container, new MoviesListFragment())
+                        .commit();
+            }
 
         }
     }
