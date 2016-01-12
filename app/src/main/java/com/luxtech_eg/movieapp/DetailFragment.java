@@ -68,8 +68,8 @@ public class DetailFragment extends Fragment {
         videosAL=new ArrayList<Video>();
         reviewAL=new ArrayList<Review>();
         connectionDetector= new ConnectionDetector(getActivity());
-        if(getActivity().getIntent().getExtras().containsKey(MOVIE_OBJECT_KEY)){
-            m=(Movie)getActivity().getIntent().getExtras().get(MOVIE_OBJECT_KEY);
+        if(getArguments().containsKey(MOVIE_OBJECT_KEY)){
+            m=(Movie)getArguments().get(MOVIE_OBJECT_KEY);
         }
 
     }
@@ -79,7 +79,7 @@ public class DetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView=inflater.inflate(R.layout.detail_fragment_layout,container,false);
         //// TODO: add protection if object is null
-        m=(Movie)getActivity().getIntent().getExtras().get(MOVIE_OBJECT_KEY);
+        //m=(Movie)getActivity().getIntent().getExtras().get(MOVIE_OBJECT_KEY);
 
         //// TODO: ADD find view by id
         title= (TextView)rootView.findViewById(R.id.tv_detail_movie_title);
@@ -97,8 +97,9 @@ public class DetailFragment extends Fragment {
             rating.setText(m.getRating());
             releaseDate.setText(m.getReleaseDate());
             //// TODO: add if temp image ,get poster from api
-            //Picasso.with(getActivity()).load(m.getImageUrl()).into(movieThumb);
-            movieThumb.setImageBitmap(m.getMoviePoster());
+            Picasso.with(getActivity()).load(m.getImageUrl()).into(movieThumb);
+            //Todo get movie from base64 if movie is favorite only
+            //movieThumb.setImageBitmap(m.getMoviePoster());
             applyFavIconState();
             favButton.setOnClickListener(new View.OnClickListener() {
                 @Override
