@@ -68,6 +68,9 @@ public class DetailFragment extends Fragment {
         videosAL=new ArrayList<Video>();
         reviewAL=new ArrayList<Review>();
         connectionDetector= new ConnectionDetector(getActivity());
+        if(getActivity().getIntent().getExtras().containsKey(MOVIE_OBJECT_KEY)){
+            m=(Movie)getActivity().getIntent().getExtras().get(MOVIE_OBJECT_KEY);
+        }
 
     }
 
@@ -88,47 +91,49 @@ public class DetailFragment extends Fragment {
         videos=(ListView)rootView.findViewById(R.id.lv_videos);
         reviews=(ListView)rootView.findViewById(R.id.lv_reviews);
         // TODO set images and texts
-        title.setText(m.getOriginalTitle());
-        overview.setText(m.getOverview());
-        rating.setText(m.getRating());
-        releaseDate.setText(m.getReleaseDate());
-        //// TODO: add if temp image ,get poster from api
-        //Picasso.with(getActivity()).load(m.getImageUrl()).into(movieThumb);
-        movieThumb.setImageBitmap(m.getMoviePoster());
-        applyFavIconState();
-        favButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.v(TAG, "onClick");
-                //toggle state
-                if (isFavoriteMovie()) {
+        if(m!=null) {
+            title.setText(m.getOriginalTitle());
+            overview.setText(m.getOverview());
+            rating.setText(m.getRating());
+            releaseDate.setText(m.getReleaseDate());
+            //// TODO: add if temp image ,get poster from api
+            //Picasso.with(getActivity()).load(m.getImageUrl()).into(movieThumb);
+            movieThumb.setImageBitmap(m.getMoviePoster());
+            applyFavIconState();
+            favButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.v(TAG, "onClick");
+                    //toggle state
+                    if (isFavoriteMovie()) {
 
-                    //toggle state undo favorite
-                    unFavorite();
+                        //toggle state undo favorite
+                        unFavorite();
 
-                } else {
-                    //toggle state ad to favorites
-                    favorite();
+                    } else {
+                        //toggle state ad to favorites
+                        favorite();
+                    }
                 }
-            }
-        });
-        videosAdapter= new VideosAdapter( getActivity(), videosAL );
-        reviewAdapter= new ReviewAdapter( getActivity(), reviewAL );
+            });
+            videosAdapter = new VideosAdapter(getActivity(), videosAL);
+            reviewAdapter = new ReviewAdapter(getActivity(), reviewAL);
 
-        videos.setAdapter(videosAdapter);
-        reviews.setAdapter(reviewAdapter);
-        videos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Log.v(TAG, "onItemClick");
-                Video video = videosAL.get(position);
-                Log.v(TAG, "site is " + video.getSite());
-                if (video.getSite().equals("YouTube")) {
-                    playYouTubeVideo(video);
+            videos.setAdapter(videosAdapter);
+            reviews.setAdapter(reviewAdapter);
+            videos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                    Log.v(TAG, "onItemClick");
+                    Video video = videosAL.get(position);
+                    Log.v(TAG, "site is " + video.getSite());
+                    if (video.getSite().equals("YouTube")) {
+                        playYouTubeVideo(video);
+                    }
                 }
-            }
-        });
-        getVideoAndReviews();
+            });
+            getVideoAndReviews();
+        }
         return rootView;
     }
     void playYouTubeVideo(Video video){
