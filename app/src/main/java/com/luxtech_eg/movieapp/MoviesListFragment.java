@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.luxtech_eg.movieapp.data.Movie;
@@ -51,7 +52,10 @@ public class MoviesListFragment extends Fragment {
     public final static boolean FAVORITE_MOVIES=true;
     public final static boolean ONLINE_MOVIES=false;
     String SHOW_FAV_MOVIES_KEY="show_fav_movies";
-    GridView moviesLV;
+    int mPosition= GridView.INVALID_POSITION;
+    final static String SELECTED_KEY="selected_list_item";
+     GridView moviesLV;
+
     Menu menu;
 
     static ArrayList<Movie> moviesAL = new ArrayList<Movie>();
@@ -69,12 +73,13 @@ public class MoviesListFragment extends Fragment {
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.v(TAG,"onCreate");
+        Log.v(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         sp= PreferenceManager.getDefaultSharedPreferences(getActivity());
         showFavMovies=ONLINE_MOVIES;
         connectionDetector=new ConnectionDetector(getActivity());
+
     }
 
     @Override
@@ -135,9 +140,16 @@ public class MoviesListFragment extends Fragment {
                 });
                 //passing selected movie object from fragment to MainActivity
                 ((Callback)getActivity()).onItemSelected(m);
+                mPosition=position;
 
             }
         });
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            // The listview probably hasn't even been populated yet.  Actually perform the
+            // swapout in onLoadFinished.
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
+
         return rootView;
     }
 
@@ -255,6 +267,9 @@ public class MoviesListFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
 
+        if(mPosition!=ListView.INVALID_POSITION){
+            outState.putInt(SELECTED_KEY, mPosition);
+        }
         outState.putBoolean(SHOW_FAV_MOVIES_KEY,showFavMovies);
         super.onSaveInstanceState(outState);
     }
@@ -290,8 +305,8 @@ public class MoviesListFragment extends Fragment {
 
         return retMovies;
     }
-    private static class FetchMoviesTask extends AsyncTask<String, Void, String> {
-        final static String TAG= FetchMoviesTask.class.getSimpleName();
+    private class FetchMoviesTask extends AsyncTask<String, Void, String> {
+        final  String TAG= FetchMoviesTask.class.getSimpleName();
         //ArrayList<Movie> MoviesAL= new ArrayList<Movie>();
         @Override
 
@@ -432,6 +447,15 @@ public class MoviesListFragment extends Fragment {
                 moviesAL.addAll(getMoviesFromJson(moviesjson));
                 moviesAdapter.setShowFavMovies(ONLINE_MOVIES);
                 moviesAdapter.notifyDataSetChanged();
+                if(mPosition==GridView.INVALID_POSITION&&moviesAL.size()>0){
+                    //if first time scrole
+                    mPosition=0;
+                    ((Callback)getActivity()).onItemSelected(moviesAdapter.getItem(mPosition));
+                }
+                else if(mPosition!=GridView.INVALID_POSITION){
+                    moviesLV.setSelection(mPosition);
+                    moviesLV.smoothScrollToPosition(mPosition);
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
