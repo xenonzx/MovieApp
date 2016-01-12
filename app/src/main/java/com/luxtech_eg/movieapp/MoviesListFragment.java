@@ -133,8 +133,9 @@ public class MoviesListFragment extends Fragment {
 
                     }
                 });
-                i.putExtra(DetailFragment.MOVIE_OBJECT_KEY, m);
-                startActivity(i);
+                //passing selected movie object from fragment to MainActivity
+                ((Callback)getActivity()).onItemSelected(m);
+
             }
         });
         return rootView;
@@ -436,5 +437,11 @@ public class MoviesListFragment extends Fragment {
             }
         }
     }
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(Movie movie);
 
+    }
 }
