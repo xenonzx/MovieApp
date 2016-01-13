@@ -6,7 +6,7 @@
     <dimen name="girdview_vertical_spacing">0dp</dimen>
     <dimen name="girdview_horizontal_spacing">0dp</dimen>
     <dimen name="favorite_star_icon_size">64dp</dimen>
-    <dimen name="trailer_play_icon_size">64dp</dimen>
+    <dimen name="trailer_play_icon_size">32dp</dimen>
 
     <dimen name="standard_text_view_margin">8dp</dimen>
     <dimen name="top_text_view_margin">18dp</dimen>
@@ -14,4 +14,7 @@
     <dimen name="movie_details_padding_bottom">16dp</dimen>
     <dimen name="movie_details_overview_margin">16dp</dimen>
     <dimen name="movie_details_lists_margin">24dp</dimen>
+
+    <dimen name="video_list_item_padding_vertical">16dp</dimen>
+    <dimen name="review_list_item_padding_vertical">24dp</dimen>
 </resources>

@@ -102,7 +102,9 @@
         android:id="@+id/lv_videos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/movie_details_lists_margin"
+        android:layout_marginBottom="@dimen/movie_details_lists_margin"
+        android:layout_marginLeft="@dimen/movie_details_lists_margin"
+        android:layout_marginRight="@dimen/movie_details_lists_margin"
 
         />
 
@@ -118,7 +120,10 @@
         android:id="@+id/lv_reviews"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/movie_details_lists_margin"
+        android:layout_marginBottom="@dimen/movie_details_lists_margin"
+        android:layout_marginLeft="@dimen/movie_details_lists_margin"
+        android:layout_marginRight="@dimen/movie_details_lists_margin"
+
         />
 
 </LinearLayout>
