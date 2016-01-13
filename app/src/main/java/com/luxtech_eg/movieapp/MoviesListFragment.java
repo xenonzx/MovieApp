@@ -139,7 +139,7 @@ public class MoviesListFragment extends Fragment {
                     }
                 });
                 //passing selected movie object from fragment to MainActivity
-                ((Callback)getActivity()).onItemSelected(m);
+                ((Callback)getActivity()).onItemSelected(m,false);
                 mPosition=position;
 
             }
@@ -452,7 +452,7 @@ public class MoviesListFragment extends Fragment {
                     mPosition=0;
                     // todo fix move to first bug causing inflating detail fragment before it even selected
                     //should add and 2pane=true
-                    ((Callback)getActivity()).onItemSelected(moviesAdapter.getItem(mPosition));
+                    ((Callback)getActivity()).onItemSelected(moviesAdapter.getItem(mPosition),true);
                 }
                 else if(mPosition!=GridView.INVALID_POSITION){
                     moviesLV.setSelection(mPosition);
@@ -467,7 +467,7 @@ public class MoviesListFragment extends Fragment {
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onItemSelected(Movie movie);
+        public void onItemSelected(Movie movie,boolean callOfFirstItem);
 
     }
 }

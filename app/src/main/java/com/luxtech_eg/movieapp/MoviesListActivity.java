@@ -48,9 +48,10 @@ public class MoviesListActivity extends AppCompatActivity implements MoviesListF
     }
 
     @Override
-    public void onItemSelected(Movie movie) {
+    public void onItemSelected(Movie movie,boolean callOfFirstItem) {
         Log.v(TAG, "onItemSelected");
         if (twoPane){
+            // it does not matter if it is the call of first item or not in twopanr
             Bundle arguments = new Bundle();
             arguments.putSerializable(DetailFragment.MOVIE_OBJECT_KEY, movie);
             DetailFragment df =new DetailFragment();
@@ -60,9 +61,14 @@ public class MoviesListActivity extends AppCompatActivity implements MoviesListF
                     .commit();
         }else {
             // one pane
-            Intent intent = new Intent(this, DetailActivity.class)
-                    .putExtra(DetailFragment.MOVIE_OBJECT_KEY,movie);
-            startActivity(intent);
+            // if its the call of first item we should ignore starting new activity
+            // because the user didnot actually click on grid view
+            // it was the call meant to updated the detail activity
+            // 3lashan mafta7sh activity badal el main just in case you were reading these comments
+            if(!callOfFirstItem){
+                Intent intent = new Intent(this, DetailActivity.class).putExtra(DetailFragment.MOVIE_OBJECT_KEY,movie);
+                startActivity(intent);
+            }
         }
 
     }
