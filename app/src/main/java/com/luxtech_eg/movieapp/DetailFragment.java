@@ -18,10 +18,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.luxtech_eg.movieapp.UI.ExpandableHeightListView;
 import com.luxtech_eg.movieapp.data.Movie;
 import com.luxtech_eg.movieapp.data.MoviesContract;
 import com.luxtech_eg.movieapp.data.Review;
@@ -50,8 +50,8 @@ public class DetailFragment extends Fragment {
     TextView overview;
     TextView releaseDate;
     TextView rating;
-    ListView videos;
-    ListView reviews;
+    ExpandableHeightListView videos;
+    ExpandableHeightListView reviews;
     static ArrayList<Video> videosAL;
     static ArrayList<Review> reviewAL;
 
@@ -88,8 +88,8 @@ public class DetailFragment extends Fragment {
         rating=(TextView)rootView.findViewById(R.id.tv_detail_movie_rating);
         movieThumb=(ImageView)rootView.findViewById(R.id.iv_detail_movie_thumb);
         favButton=(ImageButton)rootView.findViewById(R.id.b_detail_movie_favorite);
-        videos=(ListView)rootView.findViewById(R.id.lv_videos);
-        reviews=(ListView)rootView.findViewById(R.id.lv_reviews);
+        videos=(ExpandableHeightListView)rootView.findViewById(R.id.lv_videos);
+        reviews=(ExpandableHeightListView)rootView.findViewById(R.id.lv_reviews);
         // TODO set images and texts
         if(m!=null) {
             title.setText(m.getOriginalTitle());

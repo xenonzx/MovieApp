@@ -450,6 +450,8 @@ public class MoviesListFragment extends Fragment {
                 if(mPosition==GridView.INVALID_POSITION&&moviesAL.size()>0){
                     //if first time scrole
                     mPosition=0;
+                    // todo fix move to first bug causing inflating detail fragment before it even selected
+                    //should add and 2pane=true
                     ((Callback)getActivity()).onItemSelected(moviesAdapter.getItem(mPosition));
                 }
                 else if(mPosition!=GridView.INVALID_POSITION){

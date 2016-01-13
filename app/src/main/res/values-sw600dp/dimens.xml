@@ -8,10 +8,7 @@
     <dimen name="favorite_star_icon_size">64dp</dimen>
     <dimen name="trailer_play_icon_size">64dp</dimen>
 
-    <dimen name="standard_text_view_margin">8dp</dimen>
-    <dimen name="top_text_view_margin">18dp</dimen>
-    <dimen name="movie_details_padding_standard">32dp</dimen>
-    <dimen name="movie_details_padding_bottom">16dp</dimen>
-    <dimen name="movie_details_overview_margin">16dp</dimen>
-    <dimen name="movie_details_lists_margin">24dp</dimen>
+    <dimen name="standard_text_view_margin">16dp</dimen>
+    <dimen name="top_text_view_margin">32dp</dimen>
+    <dimen name="movie_details_padding_standard">56dp</dimen>
 </resources>
