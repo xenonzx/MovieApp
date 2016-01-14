@@ -43,8 +43,8 @@ public class MoviesListActivity extends AppCompatActivity implements MoviesListF
         }
     }
     Movie getFirstMoviObject(){
-        // TODO: retrum real first object instead of temp
-        return new Movie(102899,"temp","temp","temp","temp","/fYzpM9GmpBlIC893fNjoWCwE24H.jpg");
+
+        return null;
     }
 
     @Override

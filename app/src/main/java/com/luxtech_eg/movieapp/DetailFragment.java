@@ -77,18 +77,19 @@ public class DetailFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView=inflater.inflate(R.layout.detail_fragment_layout,container,false);
-
-        title= (TextView)rootView.findViewById(R.id.tv_detail_movie_title);
-        overview=(TextView)rootView.findViewById(R.id.tv_detail_movie_overview);
-        releaseDate= (TextView)rootView.findViewById(R.id.tv_detail_movie_release_date);
-        rating=(TextView)rootView.findViewById(R.id.tv_detail_movie_rating);
-        movieThumb=(ImageView)rootView.findViewById(R.id.iv_detail_movie_thumb);
-        favButton=(ImageButton)rootView.findViewById(R.id.b_detail_movie_favorite);
-        videos=(ExpandableHeightListView)rootView.findViewById(R.id.lv_videos);
-        reviews=(ExpandableHeightListView)rootView.findViewById(R.id.lv_reviews);
-
+        View rootView=null;
         if(m!=null) {
+            rootView=inflater.inflate(R.layout.detail_fragment_layout,container,false);
+            title= (TextView)rootView.findViewById(R.id.tv_detail_movie_title);
+            overview=(TextView)rootView.findViewById(R.id.tv_detail_movie_overview);
+            releaseDate= (TextView)rootView.findViewById(R.id.tv_detail_movie_release_date);
+            rating=(TextView)rootView.findViewById(R.id.tv_detail_movie_rating);
+            movieThumb=(ImageView)rootView.findViewById(R.id.iv_detail_movie_thumb);
+            favButton=(ImageButton)rootView.findViewById(R.id.b_detail_movie_favorite);
+            videos=(ExpandableHeightListView)rootView.findViewById(R.id.lv_videos);
+            reviews=(ExpandableHeightListView)rootView.findViewById(R.id.lv_reviews);
+
+
             title.setText(m.getOriginalTitle());
             overview.setText(m.getOverview());
             rating.setText(m.getRating());

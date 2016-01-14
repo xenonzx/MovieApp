@@ -11,7 +11,6 @@
         android:id="@+id/tv_detail_movie_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="this is Title"
         android:textAppearance="?android:textAppearanceLarge"
         android:gravity="center"/>
     <LinearLayout
@@ -23,8 +22,6 @@
             android:id="@+id/iv_detail_movie_thumb"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:src="@drawable/temp"
-
             android:layout_weight="1"
             android:paddingTop="@dimen/movie_details_padding_standard"
             android:paddingLeft="@dimen/movie_details_padding_standard"
@@ -46,7 +43,6 @@
                 android:id="@+id/tv_detail_movie_release_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="8/10"
                 android:textAppearance="?android:textAppearanceMedium"
                 android:layout_marginTop="@dimen/top_text_view_margin"
                 android:layout_marginBottom="@dimen/standard_text_view_margin"
@@ -57,7 +53,6 @@
                 android:id="@+id/tv_detail_movie_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="this is Title"
                 android:textAppearance="?android:textAppearanceMedium"
                 android:layout_marginTop="@dimen/standard_text_view_margin"
                 android:layout_marginBottom="@dimen/standard_text_view_margin"
@@ -68,7 +63,6 @@
                 android:id="@+id/b_detail_movie_favorite"
                 android:layout_width="@dimen/favorite_star_icon_size"
                 android:layout_height="@dimen/favorite_star_icon_size"
-                android:src="@drawable/fav_false"
                 android:background="@color/transparent"
                 android:scaleType="fitCenter"
                 android:layout_marginTop="@dimen/standard_text_view_margin"
@@ -80,7 +74,6 @@
         android:id="@+id/tv_detail_movie_overview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="this is desc"
         android:layout_margin="@dimen/movie_details_overview_margin"
         />
 
