@@ -12,7 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:textAppearanceLarge"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:background="@color/movie_title_background"
+        android:textColor="@color/movie_title_font_color"
+        android:padding="@dimen/movie_title_padding"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="transparent">#0000</color>
+    <color name="movie_title_background">#2196F3</color>
+    <color name="movie_title_font_color">#fff</color>
 </resources>

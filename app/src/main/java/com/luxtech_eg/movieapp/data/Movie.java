@@ -26,6 +26,7 @@ public class Movie implements Serializable {
     String thumbnailRelativeLink;
     final static String THUMBNAIL_BASE= "http://image.tmdb.org/t/p/";
     final static String IMAGE_SIZE="w185";
+
     Movie(int id){
         this .id=id;
     }
@@ -38,6 +39,7 @@ public class Movie implements Serializable {
         this.releaseDate = releaseDate;
         this.rating = rating;
         this.thumbnailRelativeLink = thumbnilLink;
+
     }
     public Movie(int id, String originalTitle,  String overview, String releaseDate, String rating, String thumbnilLink,String base65Image) {
         this.id = id;
@@ -137,5 +139,13 @@ public class Movie implements Serializable {
         byte[] decodedString = Base64.decode(this.imageBase64, Base64.DEFAULT);
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         return  decodedByte;
+    }
+    public boolean hasBase64Image(){
+        if( this.imageBase64==null){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 }

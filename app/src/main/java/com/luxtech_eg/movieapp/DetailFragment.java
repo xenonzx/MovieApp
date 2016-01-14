@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -95,9 +94,14 @@ public class DetailFragment extends Fragment {
             rating.setText(m.getRating());
             releaseDate.setText(m.getReleaseDate());
             //// TODO: add if temp image ,get poster from api
-            Picasso.with(getActivity()).load(m.getImageUrl()).into(movieThumb);
+            if (m.hasBase64Image()){
+                movieThumb.setImageBitmap(m.getMoviePoster());
+            }else {
+                //and since picasso use cashing if the network/internet is cut an image will still be displayed
+                Picasso.with(getActivity()).load(m.getImageUrl()).into(movieThumb);
+            }
             //Todo get movie from base64 if movie is favorite only
-            //movieThumb.setImageBitmap(m.getMoviePoster());
+            //
             applyFavIconState();
             favButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -246,8 +250,7 @@ public class DetailFragment extends Fragment {
         Uri movieUri = MoviesContract.FavoriteMovieEntry.buildFavoriteMovieUri(m.getId());
 
         Cursor c = getActivity().getContentResolver().query(movieUri, null, null, null, null);
-        Log.v(TAG, "dumpCursor");
-        DatabaseUtils.dumpCursor(c);
+
         if (c.getCount() == 0) {
             Log.v(TAG, "This movie is NOT Favorite");
             return false;

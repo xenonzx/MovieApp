@@ -17,4 +17,5 @@
 
     <dimen name="video_list_item_padding_vertical">16dp</dimen>
     <dimen name="review_list_item_padding_vertical">24dp</dimen>
+    <dimen name="movie_title_padding">8dp</dimen>
 </resources>
