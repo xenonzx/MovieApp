@@ -7,7 +7,7 @@
     <string name="movies_sorting_default_value">pop</string>
     <string name="movies_sorting_popular">pop</string>
     <string name="movies_sorting_highest_rated">hi</string>
-
+    <string name="action_share">Share</string>
     <string-array name="movie_sorting_entries">
         <item>highest rated</item>
         <item>most popular</item>

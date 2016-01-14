@@ -8,9 +8,14 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -41,6 +46,7 @@ import java.util.ArrayList;
 public class DetailFragment extends Fragment {
     final static String TAG=DetailFragment.class.getSimpleName();
     final static String APIKEY= ApiKeyHolder.getAPIKEY();
+    private static ShareActionProvider mShareActionProvider;
 
     public final static String MOVIE_OBJECT_KEY="movie_key";
     ImageView movieThumb;
@@ -53,13 +59,13 @@ public class DetailFragment extends Fragment {
     ExpandableHeightListView reviews;
     static ArrayList<Video> videosAL;
     static ArrayList<Review> reviewAL;
-
+    String ShareTrailer;
     static VideosAdapter videosAdapter;
     static ReviewAdapter reviewAdapter;
     ArrayAdapter reviewsAdapter;
 
     ConnectionDetector connectionDetector;
-    Movie m;
+    static Movie m;
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -70,6 +76,7 @@ public class DetailFragment extends Fragment {
         if(getArguments().containsKey(MOVIE_OBJECT_KEY)){
             m=(Movie)getArguments().get(MOVIE_OBJECT_KEY);
         }
+        setHasOptionsMenu(true);
 
     }
 
@@ -135,9 +142,37 @@ public class DetailFragment extends Fragment {
                     }
                 }
             });
-            getVideoAndReviews();
+
         }
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if(m!=null) {
+            //TODO solve share action is sharing name only
+            
+            getVideoAndReviews();
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Log.d(TAG, "onCreateOptionsMenu");
+        inflater.inflate(R.menu.detailfragment, menu);
+        MenuItem item = menu.findItem(R.id.menu_item_share);
+
+        // for compatibility  MenuItemCompat
+        mShareActionProvider =(ShareActionProvider) MenuItemCompat.getActionProvider(item);
+        if (m!=null){
+            // if we already have a forecast
+            mShareActionProvider.setShareIntent(createShareIntent());
+        }
+        else{
+            Log.d(TAG, "share action provider is null");
+        }
+
     }
     void playYouTubeVideo(Video video){
 
@@ -203,7 +238,7 @@ public class DetailFragment extends Fragment {
         Log.v(TAG, "unFavorite");
 
         Uri movieUri = MoviesContract.FavoriteMovieEntry.buildFavoriteMovieUri(m.getId());
-        int rowDeleted=getActivity().getContentResolver().delete(movieUri,null,null);
+        int rowDeleted=getActivity().getContentResolver().delete(movieUri, null, null);
         Log.v(TAG, "rowDeleted "+rowDeleted);
         favButton.setImageResource(R.drawable.fav_false);
     }
@@ -214,7 +249,7 @@ public class DetailFragment extends Fragment {
         // i used setImageBase64 here so content values returned from getInsertContentValues conains image value
 
         saveMovieThumbToObject();
-        Uri inserted = getActivity().getContentResolver().insert(MoviesContract.FavoriteMovieEntry.CONTENT_URI,m.getInsertContentValues());
+        Uri inserted = getActivity().getContentResolver().insert(MoviesContract.FavoriteMovieEntry.CONTENT_URI, m.getInsertContentValues());
         Log.v(TAG,inserted.toString());
         favButton.setImageResource(R.drawable.fav_true);
 
@@ -227,13 +262,13 @@ public class DetailFragment extends Fragment {
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 ByteArrayOutputStream bao = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bao);
-                byte [] ba = bao.toByteArray();
+                byte[] ba = bao.toByteArray();
                 m.setImageBase64(Base64.encodeToString(ba, Base64.DEFAULT));
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
-            // todo add temp Bimap
+                // todo add temp Bimap
             }
 
             @Override
@@ -243,7 +278,25 @@ public class DetailFragment extends Fragment {
         });
     }
 
+    static Intent createShareIntent(){
+        Log.d(TAG, "createShareIntent");
+        Intent mShareIntent = new Intent();
+        mShareIntent.setAction(Intent.ACTION_SEND);
+        mShareIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        mShareIntent.setType("text/plain");
+        if(videosAL.size()>1){
+            //just in case the array is empty :D
+            Log.d(TAG, ""+videosAL.get(0).getYouTubeHttpUri());
+            mShareIntent.putExtra(Intent.EXTRA_TEXT, videosAL.get(0).getYouTubeHttpUri());
+        }
+        else {
+            Log.d(TAG, ""+ m.getOriginalTitle());
+            mShareIntent.putExtra(Intent.EXTRA_TEXT, m.getOriginalTitle());
+        }
 
+        //mShareIntent.putExtra(Intent.EXTRA_TEXT, getActivity().getIntent().getStringExtra("forecastString") + "#SUNSHINE");
+        return  mShareIntent;
+    }
 
     boolean isFavoriteMovie() {
 
@@ -300,12 +353,15 @@ public class DetailFragment extends Fragment {
         protected void onPostExecute(String s) {
             Log.v(LogTag,"onPostExecute");
             super.onPostExecute(s);
-            Log.v(LogTag,s);
+            Log.v(LogTag, s);
 
             try {
                 videosAL.clear();
                 videosAL.addAll(getVideosFromJson(s));
                 videosAdapter.notifyDataSetChanged();
+                if (mShareActionProvider != null) {
+                    mShareActionProvider.setShareIntent(createShareIntent());
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
