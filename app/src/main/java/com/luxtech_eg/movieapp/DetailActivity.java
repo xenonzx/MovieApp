@@ -14,7 +14,7 @@ public class DetailActivity extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity_layout);
         if (savedInstanceState == null) {
-            //Todo addprotection against null extras
+
             Movie m=(Movie)getIntent().getExtras().getSerializable(DetailFragment.MOVIE_OBJECT_KEY);
             Bundle arguments = new Bundle();
             arguments.putSerializable(DetailFragment.MOVIE_OBJECT_KEY, m);

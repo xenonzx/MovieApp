@@ -63,7 +63,7 @@ public class DetailFragment extends Fragment {
     Movie m;
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        //TODO restore instance state if its a a must
+
         super.onCreate(savedInstanceState);
         videosAL=new ArrayList<Video>();
         reviewAL=new ArrayList<Review>();
@@ -78,10 +78,7 @@ public class DetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView=inflater.inflate(R.layout.detail_fragment_layout,container,false);
-        //// TODO: add protection if object is null
-        //m=(Movie)getActivity().getIntent().getExtras().get(MOVIE_OBJECT_KEY);
 
-        //// TODO: ADD find view by id
         title= (TextView)rootView.findViewById(R.id.tv_detail_movie_title);
         overview=(TextView)rootView.findViewById(R.id.tv_detail_movie_overview);
         releaseDate= (TextView)rootView.findViewById(R.id.tv_detail_movie_release_date);
@@ -90,7 +87,7 @@ public class DetailFragment extends Fragment {
         favButton=(ImageButton)rootView.findViewById(R.id.b_detail_movie_favorite);
         videos=(ExpandableHeightListView)rootView.findViewById(R.id.lv_videos);
         reviews=(ExpandableHeightListView)rootView.findViewById(R.id.lv_reviews);
-        // TODO set images and texts
+
         if(m!=null) {
             title.setText(m.getOriginalTitle());
             overview.setText(m.getOverview());
@@ -160,7 +157,7 @@ public class DetailFragment extends Fragment {
             Toast.makeText(getActivity(),R.string.toast_message_no_internet_no_videos_no_reviews,Toast.LENGTH_LONG).show();
         }
     }
-    // // TODO:  add transparency change to action bar
+
     void getVideos(){
         Log.v(TAG,"getVideos");
         String url = buildVideosUrl(m);
@@ -199,22 +196,22 @@ public class DetailFragment extends Fragment {
     }
     private void unFavorite() {
         Log.v(TAG, "unFavorite");
-        //TODO add the Body of UnFavorite function and change iconon success
+
         Uri movieUri = MoviesContract.FavoriteMovieEntry.buildFavoriteMovieUri(m.getId());
         int rowDeleted=getActivity().getContentResolver().delete(movieUri,null,null);
         Log.v(TAG, "rowDeleted "+rowDeleted);
-        favButton.setImageResource(R.drawable.star_false);
+        favButton.setImageResource(R.drawable.fav_false);
     }
     private void favorite() {
         Log.v(TAG, "favorite");
-        //TODO add the Body of favorite function
+
         //once a movie is favorited its image bitmap is converted to base64 formate and base 64 string is added to object to be inserted into db
         // i used setImageBase64 here so content values returned from getInsertContentValues conains image value
 
         saveMovieThumbToObject();
         Uri inserted = getActivity().getContentResolver().insert(MoviesContract.FavoriteMovieEntry.CONTENT_URI,m.getInsertContentValues());
         Log.v(TAG,inserted.toString());
-        favButton.setImageResource(R.drawable.star_true);
+        favButton.setImageResource(R.drawable.fav_true);
 
 
     }
@@ -244,7 +241,7 @@ public class DetailFragment extends Fragment {
 
 
     boolean isFavoriteMovie() {
-        //todo add body to this function get from db/sp
+
         Uri movieUri = MoviesContract.FavoriteMovieEntry.buildFavoriteMovieUri(m.getId());
 
         Cursor c = getActivity().getContentResolver().query(movieUri, null, null, null, null);
@@ -263,7 +260,7 @@ public class DetailFragment extends Fragment {
                 Log.v(TAG, "Duplication in data");
                 return true;
             }
-            else if (c.getCount() > 1) {
+            else if (c.getCount() < 1) {
                 Log.v(TAG, "isFavoriteMovie count is returning negative");
                 return true;
             }
@@ -275,16 +272,16 @@ public class DetailFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        //Todo save instance state
+
         super.onSaveInstanceState(outState);
     }
     void applyFavIconState(){
         // TODO change star icon to hart icon
         if(isFavoriteMovie()) {
-            favButton.setImageResource(R.drawable.star_true);
+            favButton.setImageResource(R.drawable.fav_true);
         }
         else {
-            favButton.setImageResource(R.drawable.star_false);
+            favButton.setImageResource(R.drawable.fav_false);
         }
     }
     static class FetchMovieVideos extends FetchTaskGET{
@@ -300,7 +297,7 @@ public class DetailFragment extends Fragment {
             Log.v(LogTag,"onPostExecute");
             super.onPostExecute(s);
             Log.v(LogTag,s);
-            //// TODO: 26/12/15 add parsing to get youtube string
+
             try {
                 videosAL.clear();
                 videosAL.addAll(getVideosFromJson(s));
@@ -358,7 +355,6 @@ public class DetailFragment extends Fragment {
             Log.v(LogTag, "onPostExecute");
             super.onPostExecute(s);
             Log.v(LogTag,s);
-            //// TODO: 26/12/15 add parsing to get youtube string
             try {
                 reviewAL.clear();
                 reviewAL.addAll(getReviewsFromJson(s));

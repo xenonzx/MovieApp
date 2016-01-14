@@ -54,11 +54,7 @@ public class MoviesAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View view, ViewGroup viewGroup) {
         view= layoutInflater.inflate(R.layout.list_item_movie,viewGroup,false);
-        //TODO clean code
-        //TextView title=(TextView)view.findViewById(R.id.tv_movie_title);
         ImageView thumb=(ImageView)view.findViewById(R.id.iv_movie_thumb);
-        //title.setText(movieArrayList.get(position).getOriginalTitle());
-        //TODO add retreeving fav moviesin from db
         if(isShowFavMovies()==MoviesListFragment.ONLINE_MOVIES) {
             Log.v(TAG,"poster using picasso");
             Picasso.with(mContext).load(movieArrayList.get(position).getImageUrl()).into(thumb);
@@ -66,7 +62,7 @@ public class MoviesAdapter extends BaseAdapter {
             Log.v(TAG,"poster from db");
            thumb.setImageBitmap(movieArrayList.get(position).getMoviePoster());
         }
-        //thumb.setImageResource(R.drawable.temp);
+
         return view;
     }
 

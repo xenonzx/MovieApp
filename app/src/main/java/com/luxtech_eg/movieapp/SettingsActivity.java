@@ -8,7 +8,7 @@ import android.preference.PreferenceFragment;
  * Created by ahmed on 26/12/15.
  */
 public class SettingsActivity extends PreferenceActivity{
-    //TODO add pprefs binding
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

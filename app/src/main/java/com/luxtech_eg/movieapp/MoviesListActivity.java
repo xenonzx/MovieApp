@@ -26,7 +26,7 @@ public class MoviesListActivity extends AppCompatActivity implements MoviesListF
 
 
             if (twoPane) {
-                //todo detail fragment with the first movie
+
                 Bundle arguments = new Bundle();
                 arguments.putSerializable(DetailFragment.MOVIE_OBJECT_KEY, getFirstMoviObject());
                 DetailFragment df =new DetailFragment();

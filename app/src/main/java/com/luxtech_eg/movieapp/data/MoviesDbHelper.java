@@ -31,7 +31,6 @@ public class                                                                    
                 FavoriteMovieEntry.COLUMN_THUMB_RELATIVE_LINK + " TEXT NOT NULL," +
                 FavoriteMovieEntry.COLUMN_THUMB_BASE_64 + " TEXT NOT NULL " +
                 " );";
-        //TODO add  field for saving images for  offline use
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIES_TABLE);
                             
     }

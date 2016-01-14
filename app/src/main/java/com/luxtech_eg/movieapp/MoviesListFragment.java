@@ -43,8 +43,6 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import static android.database.DatabaseUtils.dumpCursor;
-
 /**
  * Created by ahmed on 05/12/15.
  */
@@ -105,13 +103,8 @@ public class MoviesListFragment extends Fragment {
         Log.v(TAG,"onCreateView");
         View rootView = inflater.inflate(R.layout.movies_list_fragment_layout,container,false);
         moviesLV= (GridView) rootView.findViewById(R.id.listview_movies);
-        //TODO remove commented line after implementing your adapter correctly
-        //moviesAdapter= new ArrayAdapter<String>(getActivity(),R.layout.list_item_movie,R.id.tv_movie_title,moviesAL);
         moviesAdapter= new MoviesAdapter(getActivity(),moviesAL);
         moviesLV.setAdapter(moviesAdapter);
-        //TODO remove the following lines later start
-
-        //// TODO: end
         moviesLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -130,7 +123,7 @@ public class MoviesListFragment extends Fragment {
 
                     @Override
                     public void onBitmapFailed(Drawable errorDrawable) {
-                        // todo add temp Bimap
+                        // todo add temp Bimap plaseholder
                     }
 
                     @Override
@@ -284,9 +277,6 @@ public class MoviesListFragment extends Fragment {
         ArrayList<Movie> retMovies= new ArrayList<Movie>();
         //parse the cursor row into Movie object
         Cursor movieCursor = getFavoriteMoviesCursor();
-        // Todo  remove dumpcursor
-        dumpCursor(movieCursor);
-        // loop over cursor
         if (movieCursor.moveToFirst()){
             //note to self
             do{
@@ -440,7 +430,7 @@ public class MoviesListFragment extends Fragment {
         protected void onPostExecute(String moviesjson) {
             super.onPostExecute(moviesjson);
             try {
-                //TODO solve empty layout bug
+
                 //moviesAL
 
                 moviesAL.clear();
@@ -450,7 +440,7 @@ public class MoviesListFragment extends Fragment {
                 if(mPosition==GridView.INVALID_POSITION&&moviesAL.size()>0){
                     //if first time scrole
                     mPosition=0;
-                    // todo fix move to first bug causing inflating detail fragment before it even selected
+                    //
                     //should add and 2pane=true
                     ((Callback)getActivity()).onItemSelected(moviesAdapter.getItem(mPosition),true);
                 }
