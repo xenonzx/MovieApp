@@ -68,6 +68,9 @@ public class Video {
     public Uri getYouTubeVndUri(){
         return Uri.parse(YouTube_BASE_VND_LINK +key);
     }
+    public String getYouTubeHttpString(){
+        return Uri.parse(YouTube_BASE_HTTP_LINK +key).toString();
+    }
 
 
 }

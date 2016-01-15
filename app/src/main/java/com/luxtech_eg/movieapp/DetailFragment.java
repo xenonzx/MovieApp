@@ -47,6 +47,7 @@ public class DetailFragment extends Fragment {
     final static String TAG=DetailFragment.class.getSimpleName();
     final static String APIKEY= ApiKeyHolder.getAPIKEY();
     private static ShareActionProvider mShareActionProvider;
+    static Video shareTrailer;
 
     public final static String MOVIE_OBJECT_KEY="movie_key";
     ImageView movieThumb;
@@ -152,7 +153,7 @@ public class DetailFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         if(m!=null) {
             //TODO solve share action is sharing name only
-            
+            //TODO solv
             getVideoAndReviews();
         }
     }
@@ -165,7 +166,7 @@ public class DetailFragment extends Fragment {
 
         // for compatibility  MenuItemCompat
         mShareActionProvider =(ShareActionProvider) MenuItemCompat.getActionProvider(item);
-        if (m!=null){
+        if (shareTrailer!=null){
             // if we already have a forecast
             mShareActionProvider.setShareIntent(createShareIntent());
         }
@@ -278,16 +279,16 @@ public class DetailFragment extends Fragment {
         });
     }
 
-    static Intent createShareIntent(){
+    Intent createShareIntent(){
         Log.d(TAG, "createShareIntent");
         Intent mShareIntent = new Intent();
         mShareIntent.setAction(Intent.ACTION_SEND);
         mShareIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         mShareIntent.setType("text/plain");
-        if(videosAL.size()>1){
+        if(shareTrailer!=null){
             //just in case the array is empty :D
-            Log.d(TAG, ""+videosAL.get(0).getYouTubeHttpUri());
-            mShareIntent.putExtra(Intent.EXTRA_TEXT, videosAL.get(0).getYouTubeHttpUri());
+            Log.d(TAG, ""+shareTrailer.getYouTubeHttpUri());
+            mShareIntent.putExtra(Intent.EXTRA_TEXT,shareTrailer.getYouTubeHttpString());
         }
         else {
             Log.d(TAG, ""+ m.getOriginalTitle());
@@ -341,7 +342,28 @@ public class DetailFragment extends Fragment {
             favButton.setImageResource(R.drawable.fav_false);
         }
     }
-    static class FetchMovieVideos extends FetchTaskGET{
+
+
+    public void updateShare(Video video) {
+
+
+        Intent mShareIntent = new Intent();
+        mShareIntent.setAction(Intent.ACTION_SEND);
+        mShareIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        mShareIntent.setType("text/plain");
+        if(videosAL.size()>1){
+            //just in case the array is empty :D
+            Log.d(TAG, ""+videosAL.get(0).getYouTubeHttpUri());
+            mShareIntent.putExtra(Intent.EXTRA_TEXT,video.getYouTubeHttpUri());
+        }
+        else {
+            Log.d(TAG, ""+ m.getOriginalTitle());
+            mShareIntent.putExtra(Intent.EXTRA_TEXT, m.getOriginalTitle());
+        }
+
+    }
+
+    class FetchMovieVideos extends FetchTaskGET{
         String LogTag=FetchMovieVideos.class.getSimpleName();
         @Override
         protected void onPreExecute() {
@@ -359,9 +381,14 @@ public class DetailFragment extends Fragment {
                 videosAL.clear();
                 videosAL.addAll(getVideosFromJson(s));
                 videosAdapter.notifyDataSetChanged();
-                if (mShareActionProvider != null) {
+                if(videosAL.size()>0) {
+                    shareTrailer = videosAL.get(0);
+                }
+                if (shareTrailer!=null){
+                    // if we already have a forecast
                     mShareActionProvider.setShareIntent(createShareIntent());
                 }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -458,6 +485,5 @@ public class DetailFragment extends Fragment {
         }
 
     }
-
 
 }
