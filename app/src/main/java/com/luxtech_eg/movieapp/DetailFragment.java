@@ -166,7 +166,7 @@ public class DetailFragment extends Fragment {
 
         // for compatibility  MenuItemCompat
         mShareActionProvider =(ShareActionProvider) MenuItemCompat.getActionProvider(item);
-        if (shareTrailer!=null){
+        if (shareTrailer!=null&&mShareActionProvider!=null){
             // if we already have a forecast
             mShareActionProvider.setShareIntent(createShareIntent());
         }
@@ -384,7 +384,7 @@ public class DetailFragment extends Fragment {
                 if(videosAL.size()>0) {
                     shareTrailer = videosAL.get(0);
                 }
-                if (shareTrailer!=null){
+                if (shareTrailer!=null&&mShareActionProvider!=null){
                     // if we already have a forecast
                     mShareActionProvider.setShareIntent(createShareIntent());
                 }
