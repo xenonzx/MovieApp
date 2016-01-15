@@ -58,7 +58,9 @@ public class MoviesListActivity extends AppCompatActivity implements MoviesListF
             df.setArguments(arguments);
             getFragmentManager().beginTransaction()
                     .replace(R.id.detail_container,df )
-                    .commit();
+                    .commitAllowingStateLoss ();
+            // allowing commitAllowingStateLoss just in case data is updated and mobile is sleep
+            //you cant do callback if the activity passed onsave state
         }else {
             // one pane
             // if its the call of first item we should ignore starting new activity
