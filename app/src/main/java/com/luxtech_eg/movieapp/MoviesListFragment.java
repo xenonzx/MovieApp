@@ -47,36 +47,34 @@ import java.util.ArrayList;
  * Created by ahmed on 05/12/15.
  */
 public class MoviesListFragment extends Fragment {
-    public final static boolean FAVORITE_MOVIES=true;
-    public final static boolean ONLINE_MOVIES=false;
-    String SHOW_FAV_MOVIES_KEY="show_fav_movies";
-    int mPosition= GridView.INVALID_POSITION;
-    final static String SELECTED_KEY="selected_list_item";
-     GridView moviesLV;
-
-    Menu menu;
-
+    public final static boolean FAVORITE_MOVIES = true;
+    public final static boolean ONLINE_MOVIES = false;
+    final static String SELECTED_KEY = "selected_list_item";
+    final static String APIKEY = ApiKeyHolder.getAPIKEY();
+    final static String TAG = MoviesListFragment.class.getSimpleName();
     static ArrayList<Movie> moviesAL = new ArrayList<Movie>();
     static MoviesAdapter moviesAdapter;
-
-    final static String APIKEY= ApiKeyHolder.getAPIKEY();
-    final static String TAG=MoviesListFragment.class.getSimpleName();
+    String SHOW_FAV_MOVIES_KEY = "show_fav_movies";
+    int mPosition = GridView.INVALID_POSITION;
+    GridView moviesLV;
+    Menu menu;
     SharedPreferences sp;
     boolean showFavMovies;// this variable (showFavMovies)is to switch between retrieving favorite movies or using async task to getpopular or top rated movies
     // todo add showFavMovies in on save and on restore and set it using meanu
     ConnectionDetector connectionDetector;
 
-    public MoviesListFragment(){
+    public MoviesListFragment() {
 
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        sp= PreferenceManager.getDefaultSharedPreferences(getActivity());
-        showFavMovies=ONLINE_MOVIES;
-        connectionDetector=new ConnectionDetector(getActivity());
+        sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        showFavMovies = ONLINE_MOVIES;
+        connectionDetector = new ConnectionDetector(getActivity());
 
     }
 
@@ -87,6 +85,7 @@ public class MoviesListFragment extends Fragment {
         getMovies();
 
     }
+
     @Override
     public void onResume() {
         Log.v(TAG, "onResume");
@@ -98,12 +97,12 @@ public class MoviesListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             showFavMovies = savedInstanceState.getBoolean(SHOW_FAV_MOVIES_KEY);
-            Log.d(TAG,"savedInstanceState of showFavMovies " +showFavMovies);
+            Log.d(TAG, "savedInstanceState of showFavMovies " + showFavMovies);
         }
-        Log.v(TAG,"onCreateView");
-        View rootView = inflater.inflate(R.layout.movies_list_fragment_layout,container,false);
-        moviesLV= (GridView) rootView.findViewById(R.id.listview_movies);
-        moviesAdapter= new MoviesAdapter(getActivity(),moviesAL);
+        Log.v(TAG, "onCreateView");
+        View rootView = inflater.inflate(R.layout.movies_list_fragment_layout, container, false);
+        moviesLV = (GridView) rootView.findViewById(R.id.listview_movies);
+        moviesAdapter = new MoviesAdapter(getActivity(), moviesAL);
         moviesLV.setAdapter(moviesAdapter);
         moviesLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -111,13 +110,13 @@ public class MoviesListFragment extends Fragment {
                 Intent i = new Intent(getActivity(), DetailActivity.class);
                 //compromise : badal ma ageeb el base64 images for every item in arraylist i setit once on item clicked
                 // compromise 7elwa compromise deh
-                final Movie m= moviesAL.get(position);
+                final Movie m = moviesAL.get(position);
                 Picasso.with(getActivity()).load(m.getImageUrl()).into(new Target() {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                         ByteArrayOutputStream bao = new ByteArrayOutputStream();
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bao);
-                        byte [] ba = bao.toByteArray();
+                        byte[] ba = bao.toByteArray();
                         m.setImageBase64(Base64.encodeToString(ba, Base64.DEFAULT));
                     }
 
@@ -132,8 +131,8 @@ public class MoviesListFragment extends Fragment {
                     }
                 });
                 //passing selected movie object from fragment to MainActivity
-                ((Callback)getActivity()).onItemSelected(m,false);
-                mPosition=position;
+                ((Callback) getActivity()).onItemSelected(m, false);
+                mPosition = position;
 
             }
         });
@@ -146,20 +145,19 @@ public class MoviesListFragment extends Fragment {
         return rootView;
     }
 
-    void getMovies(){
-        String key=getString(R.string.movies_sorting_key);
-        String defualtValue=getString(R.string.movies_sorting_default_value);
-        String popularMovies=getString(R.string.movies_sorting_popular );
-        String highestRatedMovies=getString(R.string.movies_sorting_highest_rated );
-        if(showFavMovies){
+    void getMovies() {
+        String key = getString(R.string.movies_sorting_key);
+        String defualtValue = getString(R.string.movies_sorting_default_value);
+        String popularMovies = getString(R.string.movies_sorting_popular);
+        String highestRatedMovies = getString(R.string.movies_sorting_highest_rated);
+        if (showFavMovies) {
 
             moviesAL.clear();
             moviesAL.addAll(getFavoriteMovies());
             moviesAdapter.setShowFavMovies(FAVORITE_MOVIES);
             moviesAdapter.notifyDataSetChanged();
-        }
-        else {
-            if(connectionDetector.isConnectingToInternet()) {
+        } else {
+            if (connectionDetector.isConnectingToInternet()) {
                 //if there is connection to internet get movies
                 if (sp.getString(key, defualtValue).equals(popularMovies)) {
                     getPopularMovies();
@@ -168,50 +166,50 @@ public class MoviesListFragment extends Fragment {
                 } else {
                     Log.e(TAG, " niether popular nor top ");
                 }
-            }
-            else {
-                Toast.makeText(getActivity(),R.string.toast_message_no_internet,Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getActivity(), R.string.toast_message_no_internet, Toast.LENGTH_LONG).show();
 
             }
         }
     }
+
     void getPopularMovies() {
-        Log.v(TAG,"getPopularMovies");
-        String popMoviesUrl=buildPopularMoviesUri();
-        Log.v(TAG,popMoviesUrl);
-        FetchMoviesTask fmt= new FetchMoviesTask();
+        Log.v(TAG, "getPopularMovies");
+        String popMoviesUrl = buildPopularMoviesUri();
+        Log.v(TAG, popMoviesUrl);
+        FetchMoviesTask fmt = new FetchMoviesTask();
         fmt.execute(popMoviesUrl);
 
     }
-    void getTopRatedMovies(){
-        Log.v(TAG,"getTopRatedMovies");
-        String top=buildTopRatedMoviesUri();
-        Log.v(TAG,top);
-        FetchMoviesTask fmt= new FetchMoviesTask();
+
+    void getTopRatedMovies() {
+        Log.v(TAG, "getTopRatedMovies");
+        String top = buildTopRatedMoviesUri();
+        Log.v(TAG, top);
+        FetchMoviesTask fmt = new FetchMoviesTask();
         fmt.execute(top);
     }
-    String buildPopularMoviesUri(){
+
+    String buildPopularMoviesUri() {
         //http://api.themoviedb.org/3/discover/movie?api_key=&sort_by=popularity.desc
         Uri.Builder builder = new Uri.Builder();
         builder.scheme("http").authority("api.themoviedb.org")
                 .appendPath("3")
-                .appendPath("discover")
                 .appendPath("movie")
-                .appendQueryParameter("api_key", APIKEY )
-                .appendQueryParameter("sort_by", "popularity.desc");
+                .appendPath("popular")
+                .appendQueryParameter("api_key", APIKEY);
 
         return builder.build().toString();
     }
 
-    String buildTopRatedMoviesUri(){
+    String buildTopRatedMoviesUri() {
         //http://api.themoviedb.org/3/discover/movie?api_key=[]&sort_by=vote_average.desc
         Uri.Builder builder = new Uri.Builder();
         builder.scheme("http").authority("api.themoviedb.org")
                 .appendPath("3")
-                .appendPath("discover")
                 .appendPath("movie")
-                .appendQueryParameter("api_key", APIKEY )
-                .appendQueryParameter("sort_by", "vote_average.desc");
+                .appendPath("top_rated")
+                .appendQueryParameter("api_key", APIKEY);
 
 
         return builder.build().toString();
@@ -219,12 +217,11 @@ public class MoviesListFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        this.menu=menu;
-        if (showFavMovies==ONLINE_MOVIES) {
+        this.menu = menu;
+        if (showFavMovies == ONLINE_MOVIES) {
             inflater.inflate(R.menu.movie_list_menu, menu);
 
-        }
-        else{
+        } else {
             // this means showFavMovies==FAVORITE_MOVIES
             inflater.inflate(R.menu.favorites_list_menu, menu);
         }
@@ -233,18 +230,16 @@ public class MoviesListFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==R.id.settings){
-           startActivity(new Intent(getActivity(), SettingsActivity.class));
-           return true;
-        }
-        else if(item.getItemId()==R.id.menu_favorites){
-            showFavMovies=FAVORITE_MOVIES;
+        if (item.getItemId() == R.id.settings) {
+            startActivity(new Intent(getActivity(), SettingsActivity.class));
+            return true;
+        } else if (item.getItemId() == R.id.menu_favorites) {
+            showFavMovies = FAVORITE_MOVIES;
             getMovies();
             updateMenu();
             return true;
-        }
-        else if(item.getItemId()==R.id.menu_home){
-            showFavMovies=ONLINE_MOVIES;
+        } else if (item.getItemId() == R.id.menu_home) {
+            showFavMovies = ONLINE_MOVIES;
             getMovies();
             updateMenu();
             return true;
@@ -252,51 +247,63 @@ public class MoviesListFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    void updateMenu(){
+    void updateMenu() {
         //update menu to be able to choose other case
         this.menu.clear();
         onCreateOptionsMenu(this.menu, getActivity().getMenuInflater());
     }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
 
-        if(mPosition!=ListView.INVALID_POSITION){
+        if (mPosition != ListView.INVALID_POSITION) {
             outState.putInt(SELECTED_KEY, mPosition);
         }
-        outState.putBoolean(SHOW_FAV_MOVIES_KEY,showFavMovies);
+        outState.putBoolean(SHOW_FAV_MOVIES_KEY, showFavMovies);
         super.onSaveInstanceState(outState);
     }
 
 
-    Cursor getFavoriteMoviesCursor(){
+    Cursor getFavoriteMoviesCursor() {
         //Todo move to back a ground thread
-        Log.v(TAG,"getFavoriteMoviesCursor");
+        Log.v(TAG, "getFavoriteMoviesCursor");
         return getActivity().getContentResolver().query(MoviesContract.FavoriteMovieEntry.CONTENT_URI, null, null, null, null);
     }
-    ArrayList<Movie>getFavoriteMovies(){
-        ArrayList<Movie> retMovies= new ArrayList<Movie>();
+
+    ArrayList<Movie> getFavoriteMovies() {
+        ArrayList<Movie> retMovies = new ArrayList<Movie>();
         //parse the cursor row into Movie object
         Cursor movieCursor = getFavoriteMoviesCursor();
-        if (movieCursor.moveToFirst()){
+        if (movieCursor.moveToFirst()) {
             //note to self
-            do{
-                int id=movieCursor.getInt(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry._ID));
+            do {
+                int id = movieCursor.getInt(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry._ID));
                 String title = movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_ORIGINAL_TITLE));
                 String overview = movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_OVERVIEW));
                 String rating = movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_RATING));
                 String releaseDate = movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_RELEASE_DATE));
-                String thumRelativeLink= movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_THUMB_RELATIVE_LINK));
-                String base64image= movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_THUMB_BASE_64));
-                Movie m= new Movie(id,title,overview,releaseDate,rating,thumRelativeLink,base64image);
+                String thumRelativeLink = movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_THUMB_RELATIVE_LINK));
+                String base64image = movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.FavoriteMovieEntry.COLUMN_THUMB_BASE_64));
+                Movie m = new Movie(id, title, overview, releaseDate, rating, thumRelativeLink, base64image);
                 retMovies.add(m);
-            }while(movieCursor.moveToNext());
+            } while (movieCursor.moveToNext());
         }
         movieCursor.close();
 
         return retMovies;
     }
+
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(Movie movie, boolean callOfFirstItem);
+
+    }
+
     private class FetchMoviesTask extends AsyncTask<String, Void, String> {
-        final  String TAG= FetchMoviesTask.class.getSimpleName();
+        final String TAG = FetchMoviesTask.class.getSimpleName();
+
         //ArrayList<Movie> MoviesAL= new ArrayList<Movie>();
         @Override
 
@@ -308,9 +315,9 @@ public class MoviesListFragment extends Fragment {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             String moviesJson;
-            try{
-                URL apiUrl=new URL(url[0]);
-                Log.v(TAG," url passedto AsyncTask"+url[0]);
+            try {
+                URL apiUrl = new URL(url[0]);
+                Log.v(TAG, " url passedto AsyncTask" + url[0]);
                 urlConnection = (HttpURLConnection) apiUrl.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
@@ -319,7 +326,7 @@ public class MoviesListFragment extends Fragment {
                 StringBuffer buffer = new StringBuffer();
                 if (inputStream == null) {
                     // Nothing to do.
-                    Log.v(TAG,"no input stream");
+                    Log.v(TAG, "no input stream");
                     return null;
                 }
                 reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -335,12 +342,12 @@ public class MoviesListFragment extends Fragment {
                     // Stream was empty.  No point in parsing.
                     return null;
                 }
-                moviesJson=buffer.toString();
+                moviesJson = buffer.toString();
                 return moviesJson;
 
 
-            }catch (MalformedURLException e) {
-                Log.e(TAG,"MalformedURLException");
+            } catch (MalformedURLException e) {
+                Log.e(TAG, "MalformedURLException");
                 e.printStackTrace();
             } catch (ProtocolException e) {
                 e.printStackTrace();
@@ -362,27 +369,26 @@ public class MoviesListFragment extends Fragment {
         }
 
         private ArrayList<Movie> getMoviesFromJson(String moviesJsonString) throws JSONException {
-            ArrayList<Movie>returnedMoviesAl= new ArrayList<Movie>();
-            Log.v(TAG,"getMoviesFromJson");
+            ArrayList<Movie> returnedMoviesAl = new ArrayList<Movie>();
+            Log.v(TAG, "getMoviesFromJson");
 
             final String MOVIE_RESULT_LIST = "results";
             final String MOVIE_THUMBNIL_RELATIVE_PATH = "poster_path";
             final String MOVIE_TITLE = "title";
             final String MOVIE_OVERVIEW = "overview";
             final String MOVIE_ID = "id";
-            final String MOVIE_RATING="vote_average";
-            final String MOVIE_RELEASE_DATE="release_date";
-
+            final String MOVIE_RATING = "vote_average";
+            final String MOVIE_RELEASE_DATE = "release_date";
 
 
             JSONObject moviesJson = new JSONObject(moviesJsonString);
             JSONArray resultsArray = moviesJson.getJSONArray(MOVIE_RESULT_LIST);
             //iterating over result movies
-            for(int i = 0; i < resultsArray.length(); i++) {
-                JSONObject movieJsonObj= resultsArray.getJSONObject(i);
-                Log.v(TAG,"movie object "+i+" "+movieJsonObj.toString());
+            for (int i = 0; i < resultsArray.length(); i++) {
+                JSONObject movieJsonObj = resultsArray.getJSONObject(i);
+                Log.v(TAG, "movie object " + i + " " + movieJsonObj.toString());
                 // making an Movie object with the wanted attributes
-                Movie m=new Movie(movieJsonObj.getInt(MOVIE_ID),
+                Movie m = new Movie(movieJsonObj.getInt(MOVIE_ID),
                         movieJsonObj.getString(MOVIE_TITLE),
                         movieJsonObj.getString(MOVIE_OVERVIEW),
                         movieJsonObj.getString(MOVIE_RELEASE_DATE),
@@ -393,28 +399,28 @@ public class MoviesListFragment extends Fragment {
             return returnedMoviesAl;
 
         }
+
         private ArrayList<String> getMoviesFromJsonAsString(String moviesJsonString) throws JSONException {
-            ArrayList<String>returnedMoviesAl= new ArrayList<String>();
-            Log.v(TAG,"getMoviesFromJson");
+            ArrayList<String> returnedMoviesAl = new ArrayList<String>();
+            Log.v(TAG, "getMoviesFromJson");
 
             final String MOVIE_RESULT_LIST = "results";
             final String MOVIE_THUMBNIL_RELATIVE_PATH = "poster_path";
             final String MOVIE_TITLE = "title";
             final String MOVIE_OVERVIEW = "overview";
             final String MOVIE_ID = "id";
-            final String MOVIE_RATING="vote_average";
-            final String MOVIE_RELEASE_DATE="release_date";
-
+            final String MOVIE_RATING = "vote_average";
+            final String MOVIE_RELEASE_DATE = "release_date";
 
 
             JSONObject moviesJson = new JSONObject(moviesJsonString);
             JSONArray resultsArray = moviesJson.getJSONArray(MOVIE_RESULT_LIST);
             //iterating over result movies
-            for(int i = 0; i < resultsArray.length(); i++) {
-                JSONObject movieJsonObj= resultsArray.getJSONObject(i);
-                Log.v(TAG,"movie object "+i+" "+movieJsonObj.toString());
+            for (int i = 0; i < resultsArray.length(); i++) {
+                JSONObject movieJsonObj = resultsArray.getJSONObject(i);
+                Log.v(TAG, "movie object " + i + " " + movieJsonObj.toString());
                 // making an Movie object with the wanted attributes
-                Movie m=new Movie(movieJsonObj.getInt(MOVIE_ID),
+                Movie m = new Movie(movieJsonObj.getInt(MOVIE_ID),
                         movieJsonObj.getString(MOVIE_TITLE),
                         movieJsonObj.getString(MOVIE_OVERVIEW),
                         movieJsonObj.getString(MOVIE_RELEASE_DATE),
@@ -437,14 +443,13 @@ public class MoviesListFragment extends Fragment {
                 moviesAL.addAll(getMoviesFromJson(moviesjson));
                 moviesAdapter.setShowFavMovies(ONLINE_MOVIES);
                 moviesAdapter.notifyDataSetChanged();
-                if(mPosition==GridView.INVALID_POSITION&&moviesAL.size()>0){
+                if (mPosition == GridView.INVALID_POSITION && moviesAL.size() > 0) {
                     //if first time scrole
-                    mPosition=0;
+                    mPosition = 0;
                     //
                     //should add and 2pane=true
-                    ((Callback)getActivity()).onItemSelected(moviesAdapter.getItem(mPosition),true);
-                }
-                else if(mPosition!=GridView.INVALID_POSITION){
+                    ((Callback) getActivity()).onItemSelected(moviesAdapter.getItem(mPosition), true);
+                } else if (mPosition != GridView.INVALID_POSITION) {
                     moviesLV.setSelection(mPosition);
                     moviesLV.smoothScrollToPosition(mPosition);
                 }
@@ -452,12 +457,5 @@ public class MoviesListFragment extends Fragment {
                 e.printStackTrace();
             }
         }
-    }
-    public interface Callback {
-        /**
-         * DetailFragmentCallback for when an item has been selected.
-         */
-        public void onItemSelected(Movie movie,boolean callOfFirstItem);
-
     }
 }
