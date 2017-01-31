@@ -380,7 +380,9 @@ public class MoviesListFragment extends Fragment {
             final String MOVIE_RATING = "vote_average";
             final String MOVIE_RELEASE_DATE = "release_date";
 
-
+            if (moviesJsonString == null || moviesJsonString.isEmpty()) {
+                return returnedMoviesAl;
+            }
             JSONObject moviesJson = new JSONObject(moviesJsonString);
             JSONArray resultsArray = moviesJson.getJSONArray(MOVIE_RESULT_LIST);
             //iterating over result movies
